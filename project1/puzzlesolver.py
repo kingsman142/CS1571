@@ -12,21 +12,52 @@ def execute_search(filename, keyword):
     with open(filename, "r") as config_file:
         input = config_file.readlines()
     print(input)
-    if not len(input) == 2:
-        print("Invalid input file; it should only have two lines of input!")
-        return
     if input[0] == "monitor":
-        monitor()
+        if not len(input) == 3:
+            print("Invalid input file; it should only have two lines of input!")
+            return
+        monitor(input, keyword)
     elif input[0] == "aggregation":
-        aggregation()
+        aggregation(input, keyword)
 
-def monitor(search_info): # search_info is a list of the sensors IDs, location and power to start with
-
+def monitor(search_info, search_type): # search_info is a list of the sensors IDs, location and power to start with
+                          # The following index is a list of the target IDs and locations
+                          # Power loss function is, Pt = P(t-1) - Euclidian distance between target and sensor
+                          # search_type is the type of search we're doing (bfs, unicost, greedy, iddfs and Astar )
+    sensor_info = search_info[1]
+    target_info = search_info[2]
+    if len(sensor_info) < len(target_info): # There are more targets than sensors, no solution is possible
+        print("No solution was found")
+        return
+    if search_type == "bfs":
+        pass
+    elif search_type == "unicost":
+        pass
+    elif search_type == "greedy":
+        pass
+    elif search_type == "iddfs":
+        pass
+    elif search_type == "Astar":
+        pass
     return
 
-def aggregation(search_info): # search_info is a list of the node IDs and locations of the nodes
+def aggregation(search_info, search_type): # search_info is a list of the node IDs and locations of the nodes
                               # Each of the following indices specifies a connection between two nodes and the
                               #     time delay between the two nodes.
+                              # search_type is the type of search we're doing (bfs, unicost, greedy, iddfs and Astar )
+    if search_type == "bfs":
+        pass
+    elif search_type == "unicost":
+        pass
+    elif search_type == "greedy":
+        pass
+    elif search_type == "iddfs":
+        pass
+    elif search_type == "Astar":
+        pass
+    return
+
+def bfs():
     return
 
 if not len(sys.argv) == 3:
