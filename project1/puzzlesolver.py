@@ -151,9 +151,14 @@ def find_next_optimal_cost_monitor(frontier):
     max_cost = 0
     curr_state = ()
     for state in frontier:
-        if state[4] > max_cost:
-            max_cost = state[4]
+        #if len(frontier) in range(15, 20):
+        #    print(state[3])
+        if state[3] > max_cost:
+            max_cost = state[3]
             curr_state = state
+    #if len(frontier) in range(15, 20):
+        #print(frontier)
+        #print("optimal: " + str(curr_state))
     frontier.remove(curr_state)
     return curr_state
 
