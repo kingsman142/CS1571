@@ -25,15 +25,22 @@ def execute_search(filename, keyword):
     elif input[0] == "aggregation":
         aggregation(input, keyword)
 
-
+def unicost(init_state, actions, goal_State, transition, unique_value):
+    frontier = []
+    explored = set([])
+    frontier.append(init_state)
+    goal_states = []
+    time = 1 # We already created 1 node, the initial state
+    frontier_space = 1 # Maximum amount of space the frontier grew to
+    visited = 0 # Number of nodes we have visited
 
 def iddfs(init_state, actions, goal_state, transition, unique_value):
     goal_states = []
     nodes_created = 0
     max_frontier_size = 0
     max_explored_size = 0
-    for i in xrange(0, 100):
-        info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 0, 0)
+    for i in xrange(0, 100): # From 0 depth to 100 depth (chosen arbitrarily), perform DFS
+        info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 0, 0) # initial state,
         if info:
             nodes_created += info[1]
             max_frontier_size = max(max_frontier_size, info[2])
@@ -53,27 +60,28 @@ def iddfs(init_state, actions, goal_state, transition, unique_value):
     return (state, nodes_created, (max_frontier_size, max_explored_size), max_cost) # end state, time, space, cost
 
 def dfs(state, actions, goal_state, explored, transition, unique_value, depth, max_depth, nodes_created, frontier_size, max_frontier_size):
-    state_unique_identifier = unique_value(state)
-    if goal_state(state):
-        return ([state], nodes_created, max_frontier_size, explored)
-    elif not frozenset(state_unique_identifier) in explored:
-        explored.add(frozenset(state_unique_identifier))
-        if depth < max_depth:
+    state_unique_identifier = unique_value(state) # Find the unique identifier for this state so we can add it to the explored set
+    if goal_state(state): # We have reached the goal!
+        return ([state], nodes_created, max_frontier_size, explored) # return the goal state, nodes created up to this point, max frontier size up to this point, and the explored states
+    elif not frozenset(state_unique_identifier) in explored: # We haven't visited this state yet
+        explored.add(frozenset(state_unique_identifier)) # Add the state to the explored set
+        if depth < max_depth: # We can only go up to a certain depth, so if we're already there, don't go any further
             goal_states = []
-            for action in actions:
+            for action in actions: # Execute each action
                 new_state = transition(action, state)
-                for state in new_state:
-                    frontier_size -= 1
+                #nodes_created = 0
+                for state in new_state: # For each new state that is returned, perform DFS
+                    frontier_size -= 1 # We have visited a new state, so decrease the frontier size
                     #print(max_frontier_size)
                     return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, nodes_created+len(new_state), frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)))
-                    if not return_value is None:
-                        for return_state in return_value[0]:
+                    if not return_value is None: # We have achieved some kind of goal state, so we can work with some new information
+                        for return_state in return_value[0]: # Basically pass the goal states up the DFS chain to the root node so we can return every single goal state in the end
                             #print(return_value)
                             #print(return_state)
                             #goal_states.add(return_state)
-                            goal_states.append(return_state)
+                            goal_states.append(return_state) # Transfer the goal states to the new set
                         #print(return_value)
-                        max_frontier_size = max(max_frontier_size, return_value[2])
+                        max_frontier_size = max(max_frontier_size, return_value[2]) # If we increased the frontier size, update it accordingly
             return (goal_states, nodes_created, max_frontier_size, explored)
     return None
 
