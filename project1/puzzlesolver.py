@@ -25,7 +25,7 @@ def execute_search(filename, keyword):
     elif input[0] == "aggregation":
         aggregation(input, keyword)
 
-def unicost(init_state, actions, goal_State, transition, unique_value):
+def unicost(init_state, actions, goal_state, transition, unique_value, optimal_cost):
     frontier = []
     explored = set([])
     frontier.append(init_state)
@@ -33,6 +33,30 @@ def unicost(init_state, actions, goal_State, transition, unique_value):
     time = 1 # We already created 1 node, the initial state
     frontier_space = 1 # Maximum amount of space the frontier grew to
     visited = 0 # Number of nodes we have visited
+
+    while frontier:
+        # Find the lowest cost here
+        curr_state = optimal_cost(frontier) # Loop through all states and find lowest cost
+        state_unique_identifier = unique_value(curr_state)
+        if goal_state(curr_state):
+            goal_states.append(curr_state)
+        elif not frozenset(state_unique_identifier) in explored:
+            explored.add(frozenset(state_unique_identifier))
+            visited += 1
+            for action in actions:
+                new_state = transition(action, curr_state)
+                for state in new_state:
+                    time += 1
+                    frontier.append(state)
+                frontier_space = max(len(frontier), frontier_space)
+    print("goal states: " + str(len(goal_states)))
+    max_cost = 0
+    state = ()
+    for goal_state in goal_states:
+        if goal_state[3] > max_cost:
+            state = goal_state
+            max_cost = goal_state[3]
+    return (state, time, (frontier_space, visited), max_cost) # end state, time, space, cost
 
 def iddfs(init_state, actions, goal_state, transition, unique_value):
     goal_states = []
@@ -122,6 +146,16 @@ def bfs(init_state, actions, goal_state, transition, unique_value):
             max_cost = state[3]
             goal_state = state
     return (goal_state, time, (frontier_space, visited), max_cost) # return solution path, time, space, and cost
+
+def find_next_optimal_cost_monitor(frontier):
+    max_cost = 0
+    curr_state = ()
+    for state in frontier:
+        if state[4] > max_cost:
+            max_cost = state[4]
+            curr_state = state
+    frontier.remove(curr_state)
+    return curr_state
 
 def find_next_target_sensor(action, state):
     sensors = state[0]
@@ -231,7 +265,14 @@ def monitor(search_info, search_type): # search_info is a list of the sensors ID
         print("Space: Frontier " + str(results[2][0]) + ", Visited " + str(results[2][1]))
         print("Cost: " + str(results[3]))
     elif search_type == "unicost":
-        pass
+        init_state = (sensor_info, target_info, [], sys.maxint, target_info) # sensors, targets, sensor-target pairs, cost, another copy of targets list (DO NOT MANIPULATE THIS)
+        actions = [""]
+        results = unicost(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, find_next_optimal_cost_monitor)
+        for pair in results[0][2]:
+            print(pair[0][0] + " monitors " + pair[1][0])
+        print("Time: " + str(results[1]))
+        print("Space: Frontier " + str(results[2][0]) + ", Visited " + str(results[2][1]))
+        print("Cost: " + str(results[3]))
     elif search_type == "greedy":
         pass
     elif search_type == "iddfs":
