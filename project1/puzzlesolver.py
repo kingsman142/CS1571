@@ -38,18 +38,18 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
         # Find the lowest cost here
         curr_state = optimal_cost(frontier) # Loop through all states and find lowest cost
         state_unique_identifier = unique_value(curr_state)
-        if goal_state(curr_state):
+        if goal_state(curr_state): # Check if we've reached the goal state or not
             goal_states.append(curr_state)
-        elif not frozenset(state_unique_identifier) in explored:
-            explored.add(frozenset(state_unique_identifier))
+        elif not frozenset(state_unique_identifier) in explored: # Check if we've explored this state before or not
+            explored.add(frozenset(state_unique_identifier)) # Add this state to the explored set so we never travel it again
             visited += 1
-            for action in actions:
-                new_state = transition(action, curr_state)
+            for action in actions: # Execute each action
+                new_state = transition(action, curr_state) # Generate the outcome states for this action
                 for state in new_state:
                     time += 1
-                    frontier.append(state)
-                frontier_space = max(len(frontier), frontier_space)
-    print("goal states: " + str(len(goal_states)))
+                    frontier.append(state) # Add each new state to the frontier for us to explore later
+                frontier_space = max(len(frontier), frontier_space) # Generate the new maximum frontier size
+    #print("goal states: " + str(len(goal_states)))
     max_cost = 0
     state = ()
     for goal_state in goal_states:
@@ -66,7 +66,8 @@ def iddfs(init_state, actions, goal_state, transition, unique_value):
     for i in xrange(0, 100): # From 0 depth to 100 depth (chosen arbitrarily), perform DFS
         info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 0, 0) # initial state,
         if info:
-            nodes_created += info[1]
+            #print("info[1]: " + str(info[1]))
+            nodes_created = max(info[1], nodes_created)
             max_frontier_size = max(max_frontier_size, info[2])
             max_explored_size = max(max_explored_size, info[3])
             for state in info[0]: # for state in goal states
@@ -81,31 +82,32 @@ def iddfs(init_state, actions, goal_state, transition, unique_value):
             state = goal_state
             max_cost = goal_state[3]
     #print("MAX COST: " + str(max_cost))
-    return (state, nodes_created, (max_frontier_size, max_explored_size), max_cost) # end state, time, space, cost
+    return (state, nodes_created, (max_frontier_size, len(max_explored_size)), max_cost) # end state, time, space, cost
 
 def dfs(state, actions, goal_state, explored, transition, unique_value, depth, max_depth, nodes_created, frontier_size, max_frontier_size):
     state_unique_identifier = unique_value(state) # Find the unique identifier for this state so we can add it to the explored set
     if goal_state(state): # We have reached the goal!
-        return ([state], nodes_created, max_frontier_size, explored) # return the goal state, nodes created up to this point, max frontier size up to this point, and the explored states
+        return ([state], 1, max_frontier_size, explored) # return the goal state, nodes created up to this point, max frontier size up to this point, and the explored states
     elif not frozenset(state_unique_identifier) in explored: # We haven't visited this state yet
         explored.add(frozenset(state_unique_identifier)) # Add the state to the explored set
         if depth < max_depth: # We can only go up to a certain depth, so if we're already there, don't go any further
             goal_states = []
             for action in actions: # Execute each action
                 new_state = transition(action, state)
-                #nodes_created = 0
+                #nodes_created = 0 # This is the number of nodes we've traversed in this state's subtree so far
                 for state in new_state: # For each new state that is returned, perform DFS
                     frontier_size -= 1 # We have visited a new state, so decrease the frontier size
-                    #print(max_frontier_size)
-                    return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, nodes_created+len(new_state), frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)))
+                    return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, 0, frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)))
+                    #print("ok: " + return_value[1])
                     if not return_value is None: # We have achieved some kind of goal state, so we can work with some new information
                         for return_state in return_value[0]: # Basically pass the goal states up the DFS chain to the root node so we can return every single goal state in the end
-                            #print(return_value)
-                            #print(return_state)
-                            #goal_states.add(return_state)
+                            #nodes_created += 1
                             goal_states.append(return_state) # Transfer the goal states to the new set
-                        #print(return_value)
                         max_frontier_size = max(max_frontier_size, return_value[2]) # If we increased the frontier size, update it accordingly
+                        nodes_created += return_value[1] # Sum up the number of nodes in each sumtree / path we travel
+                        #print("return_value[1]: " + str(return_value[1]) + ", new nodes created: " + str(nodes_created))
+            #print("nodes created: " + str(nodes_created))
+            nodes_created += 1
             return (goal_states, nodes_created, max_frontier_size, explored)
     return None
 
@@ -257,6 +259,7 @@ def monitor(search_info, search_type): # search_info is a list of the sensors ID
                           # search_type is the type of search we're doing (bfs, unicost, greedy, iddfs and Astar )
     sensor_info = search_info[1]
     target_info = search_info[2]
+    results = ()
     if len(sensor_info) < len(target_info): # There are more targets than sensors, no solution is possible
         print("No solution was found")
         return
@@ -264,20 +267,10 @@ def monitor(search_info, search_type): # search_info is a list of the sensors ID
         init_state = (sensor_info, target_info, [], sys.maxint, target_info) # sensors, targets, sensor-target pairs, cost, another copy of targets list (DO NOT MANIPULATE THIS)
         actions = [""]
         results = bfs(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value)
-        for pair in results[0][2]:
-            print(pair[0][0] + " monitors " + pair[1][0])
-        print("Time: " + str(results[1]))
-        print("Space: Frontier " + str(results[2][0]) + ", Visited " + str(results[2][1]))
-        print("Cost: " + str(results[3]))
     elif search_type == "unicost":
         init_state = (sensor_info, target_info, [], sys.maxint, target_info) # sensors, targets, sensor-target pairs, cost, another copy of targets list (DO NOT MANIPULATE THIS)
         actions = [""]
         results = unicost(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, find_next_optimal_cost_monitor)
-        for pair in results[0][2]:
-            print(pair[0][0] + " monitors " + pair[1][0])
-        print("Time: " + str(results[1]))
-        print("Space: Frontier " + str(results[2][0]) + ", Visited " + str(results[2][1]))
-        print("Cost: " + str(results[3]))
     elif search_type == "greedy":
         pass
     elif search_type == "iddfs":
@@ -285,13 +278,13 @@ def monitor(search_info, search_type): # search_info is a list of the sensors ID
         actions = [""]
         results = iddfs(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value)
         #print(results[0])
-        for state in results[0][2]:
-            print(state[0][0] + " monitors " + state[1][0])
-        print("Time: " + str(results[1]))
-        print("Space: Frontier " + str(results[2][0]) + ", Visited " + str(len(results[2][1])))
-        print("Cost: " + str(results[3]))
     elif search_type == "Astar":
         pass
+    for pair in results[0][2]:
+        print(pair[0][0] + " monitors " + pair[1][0])
+    print("Time: " + str(results[1]))
+    print("Space: Frontier " + str(results[2][0]) + ", Visited " + str(results[2][1]))
+    print("Cost: " + str(results[3]))
     return
 
 def aggregation(search_info, search_type): # search_info is a list of the node IDs and locations of the nodes
