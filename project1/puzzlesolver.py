@@ -52,7 +52,6 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
                     time += 1
                     frontier.append(state) # Add each new state to the frontier for us to explore later
                 frontier_space = max(len(frontier), frontier_space) # Generate the new maximum frontier size
-    #print("goal states: " + str(len(goal_states)))
     state, max_cost = get_optimal_goal_state(goal_states)
     return (state, time, (frontier_space, visited), max_cost) # end state, time, space, cost
 
@@ -64,13 +63,11 @@ def iddfs(init_state, actions, goal_state, transition, unique_value, get_optimal
     for i in xrange(0, 100): # From 0 depth to 100 depth (chosen arbitrarily), perform DFS
         info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 0, 0) # initial state,
         if info:
-            #print("info[1]: " + str(info[1]))
             nodes_created = max(info[1], nodes_created)
             max_frontier_size = max(max_frontier_size, info[2])
             max_explored_size = max(max_explored_size, info[3])
             for state in info[0]: # for state in goal states
                 goal_states.append(state)
-    #print("goal states len: " + str(len(goal_states)))
     state, max_cost = get_optimal_goal_state(goal_states)
     return (state, nodes_created, (max_frontier_size, len(max_explored_size)), max_cost) # end state, time, space, cost
 
@@ -108,12 +105,8 @@ def bfs(init_state, actions, goal_state, transition, unique_value, get_optimal_g
     print("bfs frontier size: " + str(len(frontier)))
 
     while frontier:
-        #print(len(frontier))
         curr_state = frontier.pop(0) # Pop from the left of the list
         state_unique_identifier = unique_value(curr_state)
-        #print(state_unique_identifier + " in explored: " + str((frozenset(state_unique_identifier) in explored)))
-        #print(state_unique_identifier)
-        #visited += 1
         if goal_state(curr_state):
             #print("goal state: " + str(curr_state))
             goal_states.append(curr_state)
@@ -130,7 +123,6 @@ def bfs(init_state, actions, goal_state, transition, unique_value, get_optimal_g
                     time += 1
                     frontier.append(state)
                 frontier_space = max(len(frontier), frontier_space)
-                #print("frontier: " + str(frontier_space))
 
     goal_state, max_cost = get_optimal_goal_state(goal_states)
     return (goal_state, time, (frontier_space, visited), max_cost) # return solution path, time, space, and cost
@@ -284,7 +276,6 @@ def aggregation_find_optimal_goal_state(goal_states):
     min_cost = sys.maxint
     goal_state = ()
     for state in goal_states:
-        #print("goal state: " + str(state))
         if state[3] < min_cost:
             min_cost = state[3]
             goal_state = state
@@ -309,13 +300,10 @@ def find_next_network_connection(action, state):
         path_end_node = path[-1] # Get the node at the end of the current path so we can find which nodes have a connection with it
         path_end_node_name = path_end_node[0]
         for edge in edges:
-            #print("edge: " + str(edge))
             if edge[0] == path_end_node_name or edge[1] == path_end_node_name:
                 connecting_node = str(edge[1]) if edge[0] == path_end_node_name else str(edge[0])
                 node_already_exists = False
-                #print("looking to see if it exists already: " + connecting_node)
                 for node in path:
-                    #print("node: " + str(node))
                     if connecting_node == node[0]: # This edge's node is already in the path, we can't add it again or there will be a cycle
                         node_already_exists = True
                         break
@@ -323,21 +311,17 @@ def find_next_network_connection(action, state):
                     new_path = list(path)
                     new_edge_list = list(edge_list)
                     actual_connecting_node = ()
-                    #print("connecting_node: " + str(connecting_node))
                     for node in nodes:
-                        #print("node: " + str(node) + " and " + str(connecting_node) + ": " + str(node[0] == connecting_node))
                         if node[0] == connecting_node:
                             actual_connecting_node = node
                             break
                     new_path.append(actual_connecting_node)
                     new_edge_list.append(edge)
                     new_state = (state[0], state[1], new_path, state[3] + edge[2], new_edge_list) # Update the cost of the path and the actual path
-                    #print("new state: " + str(new_state))
                     new_states.append(new_state)
     return new_states # Return the new set of states that we should scan over
 
 def find_next_optimal_cost_aggregator(frontier):
-    #print("frontier: " + str(frontier))
     max_cost = sys.maxint
     curr_state = ()
     for state in frontier:
@@ -363,7 +347,6 @@ def aggregation(search_info, search_type): # search_info is a list of the node I
     edges = []
     for i in xrange(2, len(search_info)):
         edges.append(search_info[i])
-    #print(edges)
     if search_type == "bfs":
         init_state = (search_info[1], edges, [], 0, []) # nodes, edges, path, cost, edges used in path
         actions = [""]
