@@ -18,8 +18,8 @@ def execute_search(filename, keyword):
             input[i] = eval(input[i].rstrip())
         else:
             input.remove(input[i])
-    print(input)
-    print("input len: " + str(len(input)))
+    #print(input)
+    #print("input len: " + str(len(input)))
     if input[0] == "monitor":
         if not len(input) == 3:
             print("Invalid input file; it should only have two lines of input!")
@@ -43,6 +43,8 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
         state_unique_identifier = unique_value(curr_state)
         if goal_state(curr_state): # Check if we've reached the goal state or not
             goal_states.append(curr_state)
+            the_state, max_cost = get_optimal_goal_state(goal_states)
+            return (the_state, time, (frontier_space, visited), max_cost)
         elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # Check if we've explored this state before or not
             explored.add(frozenset(state_unique_identifier)) # Add this state to the explored set so we never travel it again
             visited += 1
@@ -52,8 +54,8 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
                     time += 1
                     frontier.append(state) # Add each new state to the frontier for us to explore later
                 frontier_space = max(len(frontier), frontier_space) # Generate the new maximum frontier size
-    state, max_cost = get_optimal_goal_state(goal_states)
-    return (state, time, (frontier_space, visited), max_cost) # end state, time, space, cost
+    #state, max_cost = get_optimal_goal_state(goal_states)
+    #return (state, time, (frontier_space, visited), max_cost) # end state, time, space, cost
 
 def iddfs(init_state, actions, goal_state, transition, unique_value, get_optimal_goal_state):
     goal_states = []
@@ -66,8 +68,11 @@ def iddfs(init_state, actions, goal_state, transition, unique_value, get_optimal
             nodes_created = max(info[1], nodes_created)
             max_frontier_size = max(max_frontier_size, info[2])
             max_explored_size = max(max_explored_size, info[3])
-            for state in info[0]: # for state in goal states
-                goal_states.append(state)
+            if info[0]: # We found the first goal state, so append it to the goal states list and return its information
+                goal_states.append(info[0][0])
+                break
+            #for state in info[0]: # for state in goal states
+                #goal_states.append(state)
     state, max_cost = get_optimal_goal_state(goal_states)
     return (state, nodes_created, (max_frontier_size, len(max_explored_size)), max_cost) # end state, time, space, cost
 
@@ -86,10 +91,12 @@ def dfs(state, actions, goal_state, explored, transition, unique_value, depth, m
                     return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, 0, frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)))
                     #print("ok: " + return_value[1])
                     if not return_value is None: # We have achieved some kind of goal state, so we can work with some new information
-                        for return_state in return_value[0]: # Basically pass the goal states up the DFS chain to the root node so we can return every single goal state in the end
-                            goal_states.append(return_state) # Transfer the goal states to the new set
                         max_frontier_size = max(max_frontier_size, return_value[2]) # If we increased the frontier size, update it accordingly
                         nodes_created += return_value[1] # Sum up the number of nodes in each sumtree / path we travel
+                        for return_state in return_value[0]: # Basically pass the goal states up the DFS chain to the root node so we can return every single goal state in the end
+                            goal_states.append(return_state) # Transfer the goal states to the new set
+                        if len(goal_states) > 0:
+                            return (goal_states, nodes_created + 1, max_frontier_size, explored)
             nodes_created += 1 # Finally, add this node to the number of nodes created so we can recursively pass it up
             return (goal_states, nodes_created, max_frontier_size, explored)
     return None
@@ -102,24 +109,21 @@ def bfs(init_state, actions, goal_state, transition, unique_value, get_optimal_g
     time = 1 # We already created 1 node, the initial state
     frontier_space = 1 # Maximum amount of space the frontier grew to
     visited = 0 # Number of nodes we have visited
-    print("bfs frontier size: " + str(len(frontier)))
+    #print("bfs frontier size: " + str(len(frontier)))
 
     while frontier:
         curr_state = frontier.pop(0) # Pop from the left of the list
         state_unique_identifier = unique_value(curr_state)
         if goal_state(curr_state):
-            #print("goal state: " + str(curr_state))
             goal_states.append(curr_state)
+            break
         elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # If we haven't explored this state yet
-            #print(frozenset(state_unique_identifier))
             if state_unique_identifier:
                 explored.add(frozenset(state_unique_identifier))
             visited += 1
             for action in actions:
-                #print(str(curr_state))
                 new_state = transition(action, curr_state)
                 for state in new_state:
-                    #print("new state: " + str(state))
                     time += 1
                     frontier.append(state)
                 frontier_space = max(len(frontier), frontier_space)
@@ -343,7 +347,7 @@ def aggregation(search_info, search_type): # search_info is a list of the node I
                               # Each of the following indices specifies a connection between two nodes and the
                               #     time delay between the two nodes.
                               # search_type is the type of search we're doing (bfs, unicost, greedy, iddfs and Astar )
-    print(search_info)
+    #print(search_info)
     edges = []
     for i in xrange(2, len(search_info)):
         edges.append(search_info[i])
