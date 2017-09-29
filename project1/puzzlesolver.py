@@ -27,6 +27,8 @@ def execute_search(filename, keyword):
         monitor(input, keyword)
     elif input[0] == "aggregation":
         aggregation(input, keyword)
+    elif input[0] == "pancakes":
+        pancakes(input, keyword)
 
 def unicost(init_state, actions, goal_state, transition, unique_value, optimal_cost, get_optimal_goal_state):
     frontier = []
@@ -130,6 +132,9 @@ def bfs(init_state, actions, goal_state, transition, unique_value, get_optimal_g
 
     goal_state, max_cost = get_optimal_goal_state(goal_states)
     return (goal_state, time, (frontier_space, visited), max_cost) # return solution path, time, space, and cost
+
+def pancakes(search_info, search_type):
+    
 
 def monitor_find_optimal_goal_state(goal_states):
     max_cost = -sys.maxint
