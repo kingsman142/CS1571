@@ -1,6 +1,7 @@
 import sys
 import os
 import math
+import time as ti
 
 def execute_search(filename, keyword):
     # Output:
@@ -12,25 +13,27 @@ def execute_search(filename, keyword):
     # Cost: the final cost of the specified path or configuration.
     with open(filename, "r") as config_file:
         input = config_file.readlines()
-        input[0] = input[0].rstrip()
+        input[0] = input[0].rstrip().lower()
     for i in xrange(1, len(input)):
         if len(input[i]) > 2:
             input[i] = eval(input[i].rstrip())
         else:
             input.remove(input[i])
-    #print(input)
+    print(input)
     #print("input len: " + str(len(input)))
     if input[0] == "monitor":
         if not len(input) == 3:
             print("Invalid input file; it should only have two lines of input!")
             return
-        monitor(input, keyword)
+        monitor(input, keyword.lower())
     elif input[0] == "aggregation":
-        aggregation(input, keyword)
+        aggregation(input, keyword.lower())
     elif input[0] == "pancakes":
-        pancakes(input, keyword)
+        pancakes(input, keyword.lower())
+    else:
+        print("That's an invalid problem!")
 
-def unicost(init_state, actions, goal_state, transition, unique_value, optimal_cost, get_optimal_goal_state):
+def unicost(init_state, actions, goal_state, transition, unique_value, optimal_cost, get_optimal_goal_state, unique_value_is_a_set):
     frontier = []
     explored = set([])
     frontier.append(init_state)
@@ -43,12 +46,15 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
         # Find the lowest cost here
         curr_state = optimal_cost(frontier) # Loop through all states and find lowest cost
         state_unique_identifier = unique_value(curr_state)
+        if unique_value_is_a_set:
+            state_unique_identifier = frozenset(state_unique_identifier)
+
         if goal_state(curr_state): # Check if we've reached the goal state or not
             goal_states.append(curr_state)
             the_state, max_cost = get_optimal_goal_state(goal_states)
             return (the_state, time, (frontier_space, visited), max_cost)
-        elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # Check if we've explored this state before or not
-            explored.add(frozenset(state_unique_identifier)) # Add this state to the explored set so we never travel it again
+        elif not state_unique_identifier or not state_unique_identifier in explored: # Check if we've explored this state before or not
+            explored.add(state_unique_identifier) # Add this state to the explored set so we never travel it again
             visited += 1
             for action in actions: # Execute each action
                 new_state = transition(action, curr_state) # Generate the outcome states for this action
@@ -59,13 +65,13 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
     #state, max_cost = get_optimal_goal_state(goal_states)
     #return (state, time, (frontier_space, visited), max_cost) # end state, time, space, cost
 
-def iddfs(init_state, actions, goal_state, transition, unique_value, get_optimal_goal_state):
+def iddfs(init_state, actions, goal_state, transition, unique_value, get_optimal_goal_state, unique_value_is_a_set):
     goal_states = []
     nodes_created = 0
     max_frontier_size = 0
     max_explored_size = 0
     for i in xrange(0, 100): # From 0 depth to 100 depth (chosen arbitrarily), perform DFS
-        info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 0, 0) # initial state,
+        info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 0, 0, unique_value_is_a_set) # initial state,
         if info:
             nodes_created = max(info[1], nodes_created)
             max_frontier_size = max(max_frontier_size, info[2])
@@ -78,19 +84,22 @@ def iddfs(init_state, actions, goal_state, transition, unique_value, get_optimal
     state, max_cost = get_optimal_goal_state(goal_states)
     return (state, nodes_created, (max_frontier_size, len(max_explored_size)), max_cost) # end state, time, space, cost
 
-def dfs(state, actions, goal_state, explored, transition, unique_value, depth, max_depth, nodes_created, frontier_size, max_frontier_size):
+def dfs(state, actions, goal_state, explored, transition, unique_value, depth, max_depth, nodes_created, frontier_size, max_frontier_size, unique_value_is_a_set):
     state_unique_identifier = unique_value(state) # Find the unique identifier for this state so we can add it to the explored set
+    if unique_value_is_a_set:
+        state_unique_identifier = frozenset(state_unique_identifier)
+
     if goal_state(state): # We have reached the goal!
         return ([state], 1, max_frontier_size, explored) # return the goal state, nodes created up to this point, max frontier size up to this point, and the explored states
-    elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # We haven't visited this state yet
-        explored.add(frozenset(state_unique_identifier)) # Add the state to the explored set
+    elif not state_unique_identifier or not state_unique_identifier in explored: # We haven't visited this state yet
+        explored.add(state_unique_identifier) # Add the state to the explored set
         if depth < max_depth: # We can only go up to a certain depth, so if we're already there, don't go any further
             goal_states = []
             for action in actions: # Execute each action
                 new_state = transition(action, state)
                 for state in new_state: # For each new state that is returned, perform DFS
                     frontier_size -= 1 # We have visited a new state, so decrease the frontier size
-                    return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, 0, frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)))
+                    return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, 0, frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)), unique_value_is_a_set)
                     #print("ok: " + return_value[1])
                     if not return_value is None: # We have achieved some kind of goal state, so we can work with some new information
                         max_frontier_size = max(max_frontier_size, return_value[2]) # If we increased the frontier size, update it accordingly
@@ -103,7 +112,7 @@ def dfs(state, actions, goal_state, explored, transition, unique_value, depth, m
             return (goal_states, nodes_created, max_frontier_size, explored)
     return None
 
-def bfs(init_state, actions, goal_state, transition, unique_value, get_optimal_goal_state):
+def bfs(init_state, actions, goal_state, transition, unique_value, get_optimal_goal_state, unique_value_is_a_set):
     frontier = []
     explored = set([])
     frontier.append(init_state)
@@ -112,29 +121,232 @@ def bfs(init_state, actions, goal_state, transition, unique_value, get_optimal_g
     frontier_space = 1 # Maximum amount of space the frontier grew to
     visited = 0 # Number of nodes we have visited
     #print("bfs frontier size: " + str(len(frontier)))
+    #print("init state: " + str(init_state))
 
     while frontier:
         curr_state = frontier.pop(0) # Pop from the left of the list
+        #print("curr state: " + str(curr_state))
         state_unique_identifier = unique_value(curr_state)
+        #print("unique value is a set: " + str(unique_value_is_a_set))
+        if unique_value_is_a_set:
+            state_unique_identifier = frozenset(state_unique_identifier)
+
         if goal_state(curr_state):
             goal_states.append(curr_state)
             break
-        elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # If we haven't explored this state yet
+        #elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # If we haven't explored this state yet
+        elif not state_unique_identifier or not state_unique_identifier in explored: # If we haven't explored this state yet
             if state_unique_identifier:
-                explored.add(frozenset(state_unique_identifier))
+                #explored.add(frozenset(state_unique_identifier))
+                explored.add(state_unique_identifier)
+                #print("explored: " + str(explored))
             visited += 1
+            #print("num actions: " + str(len(actions)))
             for action in actions:
                 new_state = transition(action, curr_state)
+                #ti.sleep(.1)
+                #print("num new states: " + str(len(new_state)))
                 for state in new_state:
                     time += 1
                     frontier.append(state)
                 frontier_space = max(len(frontier), frontier_space)
+        else:
+            #print("already in the fonrtier")
+            pass
 
     goal_state, max_cost = get_optimal_goal_state(goal_states)
     return (goal_state, time, (frontier_space, visited), max_cost) # return solution path, time, space, and cost
 
+def greedy(init_state, actions, goal_state, transition, unique_value, get_optimal_goal_state, unique_value_is_a_set, best_first_greedy):
+    frontier = []
+    explored = set([])
+    frontier.append(init_state)
+    goal_states = []
+    time = 1 # We already created 1 node, the initial state
+    frontier_space = 1 # Maximum amount of space the frontier grew to
+    visited = 0 # Number of nodes we have visited
+
+    while frontier:
+        curr_state = best_first_greedy(frontier) # Pop from the left of the list
+        #print("curr state: " + str(curr_state))
+        state_unique_identifier = unique_value(curr_state)
+        #print("unique value is a set: " + str(unique_value_is_a_set))
+        if unique_value_is_a_set:
+            state_unique_identifier = frozenset(state_unique_identifier)
+
+        if goal_state(curr_state):
+            goal_states.append(curr_state)
+            break
+        #elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # If we haven't explored this state yet
+        elif not state_unique_identifier or not state_unique_identifier in explored: # If we haven't explored this state yet
+            if state_unique_identifier:
+                #explored.add(frozenset(state_unique_identifier))
+                explored.add(state_unique_identifier)
+                #print("explored: " + str(explored))
+            visited += 1
+            #print("num actions: " + str(len(actions)))
+            for action in actions:
+                new_state = transition(action, curr_state)
+                #ti.sleep(.1)
+                #print("num new states: " + str(len(new_state)))
+                for state in new_state:
+                    time += 1
+                    frontier.append(state)
+                frontier_space = max(len(frontier), frontier_space)
+        else:
+            #print("already in the fonrtier")
+            pass
+
+    goal_state, max_cost = get_optimal_goal_state(goal_states)
+    return (goal_state, time, (frontier_space, visited), max_cost) # return solution path, time, space, and cost
+
+def astar(init_state, actions, goal_state, transition, unique_value, get_optimal_goal_state, unique_value_is_a_set, best_first_astar):
+    frontier = []
+    explored = set([])
+    frontier.append(init_state)
+    goal_states = []
+    time = 1 # We already created 1 node, the initial state
+    frontier_space = 1 # Maximum amount of space the frontier grew to
+    visited = 0 # Number of nodes we have visited
+
+    while frontier:
+        curr_state = best_first_astar(frontier) # Pop from the left of the list
+        #print("curr state: " + str(curr_state))
+        state_unique_identifier = unique_value(curr_state)
+        #print("unique value is a set: " + str(unique_value_is_a_set))
+        if unique_value_is_a_set:
+            state_unique_identifier = frozenset(state_unique_identifier)
+
+        if goal_state(curr_state):
+            goal_states.append(curr_state)
+            break
+        #elif not state_unique_identifier or not frozenset(state_unique_identifier) in explored: # If we haven't explored this state yet
+        elif not state_unique_identifier or not state_unique_identifier in explored: # If we haven't explored this state yet
+            if state_unique_identifier:
+                #explored.add(frozenset(state_unique_identifier))
+                explored.add(state_unique_identifier)
+                #print("explored: " + str(explored))
+            visited += 1
+            #print("num actions: " + str(len(actions)))
+            for action in actions:
+                new_state = transition(action, curr_state)
+                #ti.sleep(.1)
+                #print("num new states: " + str(len(new_state)))
+                for state in new_state:
+                    time += 1
+                    frontier.append(state)
+                frontier_space = max(len(frontier), frontier_space)
+        else:
+            #print("already in the fonrtier")
+            pass
+
+    goal_state, max_cost = get_optimal_goal_state(goal_states)
+    return (goal_state, time, (frontier_space, visited), max_cost) # return solution path, time, space, and cost
+
+# Flips a set of pancakes (1, 2, 3, 4, 5) <--- (top to bottom format) at a specified index
+# This index will flip all the pancakes from 0 to index
+def flip_pancakes(index, curr_state):
+    pancakes = curr_state[0]
+    new_pancakes_list = tuple((-i for i in pancakes[0:index][::-1])) + pancakes[index:len(pancakes)] # Reverse the first "index" elements and append it to the rest of the original array
+    #print("before: " +  str(pancakes[2]) + ", now: " + str(pancakes[2]+1))
+    new_pancakes_num_flips = curr_state[2] + 1
+    new_state = (new_pancakes_list, curr_state[1], new_pancakes_num_flips)
+    new_states = [new_state]
+    #print("input state: " + str(curr_state) + ", new state: " + str(new_state))
+    return new_states
+
+def pancakes_goal_test(curr_state):
+    pancakes = curr_state[0]
+    pancake_n = len(pancakes) # Number of pancakes to iterate over; they should be ordered from 1 to n
+    for i in xrange(0, pancake_n):
+        if not pancakes[i] == (i+1):
+            return False # If the pancake we came across is not in decreasing diameter size or not in the correct spot in the array, we have not reached a goal state
+    return True
+
+def pancakes_unique_value(curr_state):
+    return curr_state[0] # Return the pancakes list
+
+def pancakes_find_optimal_goal_state(goal_states):
+    opt_state = ([], [], sys.maxint, [])
+    min_flips = sys.maxint
+    for state in goal_states:
+        if state[2] < min_flips: # If this state required less flips than the current opt_state
+            opt_state = state
+            min_flips = state[2]
+    return (opt_state, min_flips)
+
+def pancakes_similarity_to_goal(state):
+    pancakes = state[0]
+    pancakes_n = len(pancakes)
+    distance = 0 # For every pancake we find that's not in its correct index, we add 1 to the distance
+                 # For every pancake we find that's negative, we add 1 to the distance
+    for i in xrange(1, pancakes_len+1):
+        if pancakes[i] < 0:
+            distance += 1
+        if not abs(pancakes[i]) == i:
+            distance += 1
+    return distance
+
+def pancakes_greedy_best_first(frontier):
+    best_choice = None
+    best_similarity_to_goal = sys.maxint
+    for state in frontier:
+        this_state_similarity = pancakes_similarity_to_goal(state)
+        if best_choice is None:
+            best_choice = state
+            best_similarity_to_goal = this_state_similarity
+        elif this_state_similarity < best_similarity_to_goal:
+            best_choice = state
+            best_similarity_to_goal = this_state_similarity
+    frontier.remove(best_choice)
+    return best_choice
+
+def pancesk_astar_best_first(frontier):
+    best_choice = None
+    best_similarity_to_goal = sys.maxint
+    lowest_steps_so_far = 0
+    for state in frontier:
+        this_state_similarity = pancakes_similarity_to_goal(state)
+        if best_choice is None:
+            best_choice = state
+            best_similarity_to_goal = this_state_similarity
+            lowest_steps_so_far = state[2]
+        elif (this_state_similarity + state[2]) < (best_similarity_to_goal + lowest_steps_so_far):
+            best_choice = state
+            best_similarity_to_goal = this_state_similarity
+            lowest_steps_so_far = state[2]
+    frontier.remove(best_choice)
+    return best_choice
+
 def pancakes(search_info, search_type):
-    
+    pancake_start = search_info[1]
+    pancake_goal = search_info[2]
+    results = ()
+    if search_type == "bfs":
+        print("pancake start: " + str(pancake_start))
+        init_state = (pancake_start, pancake_goal, 0) # pancakes, goal state, 0 steps so far
+        actions = [i for i in range(1, len(pancake_goal)+1)] # Create a list from 1 to n; this indicates where we place the pancake flipper for each iteration
+        results = bfs(init_state, actions, pancakes_goal_test, flip_pancakes, pancakes_unique_value, pancakes_find_optimal_goal_state, False)
+        print("pancakes results: " + str(results))
+    elif search_type == "unicost":
+        init_state = (pancake_start, pancake_goal, 0)
+        actions = [i for i in range(1, len(pancake_goal)+1)] # Create a list from 1 to n; this indicates where we place the pancake flipper for each iteration
+        results = unicost(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, find_next_optimal_cost_monitor, monitor_find_optimal_goal_state)
+    elif search_type == "greedy":
+        pass
+    elif search_type == "iddfs":
+        init_state = (pancake_start, pancake_goal, 0)
+        actions = [i for i in range(1, len(pancake_goal)+1)] # Create a list from 1 to n; this indicates where we place the pancake flipper for each iteration
+        results = iddfs(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, monitor_find_optimal_goal_state)
+        #print(results[0])
+    elif search_type == "astar":
+        pass
+    #for pair in results[0][2]:
+        #print(pair[0][0] + " monitors " + pair[1][0])
+    print("Time: " + str(results[1]))
+    print("Space: Frontier " + str(results[2][0]) + ", Visited " + str(results[2][1]))
+    print("Cost: " + str(results[3]))
+    return
 
 def monitor_find_optimal_goal_state(goal_states):
     max_cost = -sys.maxint
@@ -257,19 +469,19 @@ def monitor(search_info, search_type): # search_info is a list of the sensors ID
     if search_type == "bfs":
         init_state = (sensor_info, target_info, [], sys.maxint, target_info) # sensors, targets, sensor-target pairs, cost, another copy of targets list (DO NOT MANIPULATE THIS)
         actions = [""]
-        results = bfs(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, monitor_find_optimal_goal_state)
+        results = bfs(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, monitor_find_optimal_goal_state, True)
     elif search_type == "unicost":
         init_state = (sensor_info, target_info, [], sys.maxint, target_info) # sensors, targets, sensor-target pairs, cost, another copy of targets list (DO NOT MANIPULATE THIS)
         actions = [""]
-        results = unicost(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, find_next_optimal_cost_monitor, monitor_find_optimal_goal_state)
+        results = unicost(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, find_next_optimal_cost_monitor, monitor_find_optimal_goal_state, True)
     elif search_type == "greedy":
         pass
     elif search_type == "iddfs":
         init_state = (sensor_info, target_info, [], sys.maxint, target_info)
         actions = [""]
-        results = iddfs(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, monitor_find_optimal_goal_state)
+        results = iddfs(init_state, actions, monitor_goal_test, find_next_target_sensor, monitor_unique_value, monitor_find_optimal_goal_state, True)
         #print(results[0])
-    elif search_type == "Astar":
+    elif search_type == "astar":
         pass
     for pair in results[0][2]:
         print(pair[0][0] + " monitors " + pair[1][0])
@@ -348,6 +560,14 @@ def aggregation_goal_test(curr_state):
     else:
         return False
 
+def aggregation_greedy_best_first(frontier):
+    best_choice = None
+    for state in frontier:
+        if best_choice is None:
+            best_choice = state
+        elif state:
+            pass
+
 def aggregation(search_info, search_type): # search_info is a list of the node IDs and locations of the nodes
                               # Each of the following indices specifies a connection between two nodes and the
                               #     time delay between the two nodes.
@@ -359,18 +579,18 @@ def aggregation(search_info, search_type): # search_info is a list of the node I
     if search_type == "bfs":
         init_state = (search_info[1], edges, [], 0, []) # nodes, edges, path, cost, edges used in path
         actions = [""]
-        results = bfs(init_state, actions, aggregation_goal_test, find_next_network_connection, aggregation_unique_value, aggregation_find_optimal_goal_state)
+        results = bfs(init_state, actions, aggregation_goal_test, find_next_network_connection, aggregation_unique_value, aggregation_find_optimal_goal_state, True)
     elif search_type == "unicost":
         init_state = (search_info[1], edges, [], 0, []) # nodes, edges, path, cost, edges used in path
         actions = [""]
-        results = unicost(init_state, actions, aggregation_goal_test, find_next_network_connection, aggregation_unique_value, find_next_optimal_cost_aggregator, aggregation_find_optimal_goal_state)
+        results = unicost(init_state, actions, aggregation_goal_test, find_next_network_connection, aggregation_unique_value, find_next_optimal_cost_aggregator, aggregation_find_optimal_goal_state, True)
     elif search_type == "greedy":
         pass
     elif search_type == "iddfs":
         init_state = (search_info[1], edges, [], 0, []) # nodes, edges, path, cost, edges used in path
         actions = [""]
-        results = iddfs(init_state, actions, aggregation_goal_test, find_next_network_connection, aggregation_unique_value, aggregation_find_optimal_goal_state)
-    elif search_type == "Astar":
+        results = iddfs(init_state, actions, aggregation_goal_test, find_next_network_connection, aggregation_unique_value, aggregation_find_optimal_goal_state, True)
+    elif search_type == "astar":
         pass
     #print("results: " + str(results))
     for node in results[0][2]:
