@@ -383,7 +383,7 @@ def find_next_target_sensor(action, state):
                         new_target_cost = val
 
                 # Straightforward; we are just generating a new permutation of sensors assigned to targets with their updated cost
-                new_state = (sensor_copy, targets, output_copy, new_target_cost, do_not_modify_targets)
+                new_state = (sensor_copy, targets, output_copy, new_target_cost, do_not_modify_targets, state[5], state[6])
                 new_states.append(new_state)
     else:
         for sensor in sensors:
@@ -408,7 +408,7 @@ def find_next_target_sensor(action, state):
                 output_copy.add(new_pair)
 
                 # Straightforward; we are just generating a new permutation of sensors assigned to targets with their updated cost
-                new_state = (sensor_copy, target_copy, output_copy, min(state[3], cost), do_not_modify_targets)
+                new_state = (sensor_copy, target_copy, output_copy, min(state[3], cost), do_not_modify_targets, state[5], state[6])
                 new_states.append(new_state)
     return new_states # Return the new set of states that we should scan over
 
@@ -431,23 +431,57 @@ def monitor_goal_test(curr_state):
 
 def monitor_greedy_best_first(frontier):
     best_choice = None
+    total_sum_distances = sys.maxint
     for state in frontier:
+        total_sensor_dist = 0
+        total_target_dist = 0
+        for sensor in state[0]: # for each sensor in this state's available sensors
+            total_sensor_dist += euclidian_distance(sensor[1], sensor[2], state[5][0], state[5][1])
+        for target in state[1]: # for each target in this state's available targets
+            total_target_dist += euclidian_distance(target[1], target[2], state[6][0], state[6][1])
+
         if best_choice is None:
             best_choice = state
-        elif state[3] > best_choice[3]:
+            total_sum_distances = total_sensor_dist + total_target_dist
+            pass
+        elif (total_sensor_dist + total_target_dist) < total_sum_distances:
             best_choice = state
+            total_sum_distances = total_sensor_dist + total_target_dist
     frontier.remove(best_choice)
     return best_choice
 
 def monitor_astar_best_first(frontier):
     best_choice = None
+    total_sum_distances = sys.maxint
     for state in frontier:
+        total_sensor_dist = 0
+        total_target_dist = 0
+        for sensor in state[0]: # for each sensor in this state's available sensors
+            total_sensor_dist += euclidian_distance(sensor[1], sensor[2], state[5][0], state[5][1])
+        for target in state[1]: # for each target in this state's available targets
+            total_target_dist += euclidian_distance(target[1], target[2], state[6][0], state[6][1])
+
         if best_choice is None:
             best_choice = state
-        elif state[3] > best_choice[3]:
+            total_sum_distances = state[3] + total_sensor_dist + total_target_dist # state[3] (current cost) + cost to get to the goal state
+            pass
+        elif (state[3] + total_sensor_dist + total_target_dist) > total_sum_distances:
             best_choice = state
+            total_sum_distances = state[3] + total_sensor_dist + total_target_dist
     frontier.remove(best_choice)
     return best_choice
+
+def find_average_location_monitor(nodes):
+    x_sum = 0
+    y_sum = 0
+    n = 0
+    for node in nodes:
+        x_sum += node[1]
+        y_sum += node[2]
+        n += 1
+    x_avg = x_sum/n
+    y_avg = y_sum/n
+    return (x_avg, y_avg)
 
 def monitor(search_info, search_type): # search_info is a list of the sensors IDs, location and power to start with
                           # The following index is a list of the target IDs and locations
@@ -456,7 +490,11 @@ def monitor(search_info, search_type): # search_info is a list of the sensors ID
     sensor_info = search_info[1]
     target_info = search_info[2]
     results = None
-    init_state = (sensor_info, target_info, [], sys.maxint, target_info)
+    average_sensor_x, average_sensor_y = find_average_location_monitor(sensor_info)
+    average_target_x, average_target_y = find_average_location_monitor(target_info)
+
+    # available sensors, available targets, target-sensor pairs, max time monitoring, immutable target copy list, average location of sensors, average location of targets
+    init_state = (sensor_info, target_info, [], sys.maxint, target_info, (average_sensor_x, average_sensor_y), (average_target_x, average_target_y))
     actions = [""] # Create a list from 1 to n; this indicates where we place the pancake flipper for each iteration
     if len(sensor_info) < len(target_info): # There are more targets than sensors, no solution is possible
         print("No solution was found")
