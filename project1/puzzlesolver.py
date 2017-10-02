@@ -3,7 +3,7 @@ import os
 import math
 import time as ti
 
-THIRTY_MINUTES = 1800 # number of seconds in thirty minutes; indicates we should say no solution was found
+TEN_MINUTES = 600 # number of seconds in TEN minutes; indicates we should say no solution was found
 
 def execute_search(filename, keyword):
     # Output:
@@ -46,7 +46,7 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == THIRTY_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = optimal_cost(frontier) # Loop through all states and find lowest cost
@@ -77,7 +77,7 @@ def iddfs(init_state, actions, goal_state, transition, unique_value, get_cost, u
 
     for i in xrange(0, 100): # From 0 depth to 100 depth (chosen arbitrarily), perform DFS
         curr_time = ti.time()
-        if curr_time - begin_time == THIRTY_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         return_info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 1, 1, unique_value_is_a_set) # initial state,
@@ -129,7 +129,7 @@ def bfs(init_state, actions, goal_state, transition, unique_value, get_cost, uni
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == THIRTY_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = frontier.pop(0) # Pop from the left of the list
@@ -164,7 +164,7 @@ def greedy(init_state, actions, goal_state, transition, unique_value, get_cost, 
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == THIRTY_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = best_first_greedy(frontier) # Find the most greedy next state
@@ -199,7 +199,7 @@ def astar(init_state, actions, goal_state, transition, unique_value, get_cost, u
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == THIRTY_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = best_first_astar(frontier) # Find the next optimal state found with A*
