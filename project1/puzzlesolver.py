@@ -15,10 +15,18 @@ def execute_search(filename, keyword):
     # Cost: the final cost of the specified path or configuration.
     with open(filename, "r") as config_file:
         input = config_file.readlines()
-        input[0] = input[0].rstrip().lower() # This input line states the type of problem
+        try:
+            input[0] = input[0].rstrip().lower() # This input line states the type of problem
+        except Exception as e:
+            print("There was an error parsing the input!")
+            return
     for i in xrange(1, len(input)): # Loop through the rest of the lines and turn strings into lists/tuples
         if len(input[i]) > 2:
-            input[i] = eval(input[i].rstrip())
+            try:
+                input[i] = eval(input[i].rstrip())
+            except Exception as e:
+                print("There was an error parsing the input!")
+                return
         else:
             input.remove(input[i]) # The length of this line is just 1 or 2, so it might be a line containing just \n; remove it
 
@@ -46,7 +54,7 @@ def unicost(init_state, actions, goal_state, transition, unique_value, optimal_c
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = optimal_cost(frontier) # Loop through all states and find lowest cost
@@ -77,7 +85,7 @@ def iddfs(init_state, actions, goal_state, transition, unique_value, get_cost, u
 
     for i in xrange(0, 100): # From 0 depth to 100 depth (chosen arbitrarily), perform DFS
         curr_time = ti.time()
-        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         return_info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 1, 1, unique_value_is_a_set) # initial state,
@@ -129,7 +137,7 @@ def bfs(init_state, actions, goal_state, transition, unique_value, get_cost, uni
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = frontier.pop(0) # Pop from the left of the list
@@ -164,7 +172,7 @@ def greedy(init_state, actions, goal_state, transition, unique_value, get_cost, 
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = best_first_greedy(frontier) # Find the most greedy next state
@@ -199,7 +207,7 @@ def astar(init_state, actions, goal_state, transition, unique_value, get_cost, u
 
     while frontier:
         curr_time = ti.time()
-        if curr_time - begin_time == TEN_MINUTES: # This algorithm is taking way too long on this input
+        if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
         curr_state = best_first_astar(frontier) # Find the next optimal state found with A*
@@ -221,6 +229,7 @@ def astar(init_state, actions, goal_state, transition, unique_value, get_cost, u
                     time += 1
                     frontier.append(state)
                 frontier_space = max(len(frontier), frontier_space)
+    print("No solution was found!")
 
 # Flips a set of pancakes (1, 2, 3, 4, 5) <--- (top to bottom format) at a specified index
 # This index will flip all the pancakes from 0 to index

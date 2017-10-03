@@ -1,0 +1,352 @@
+===== aggregation.config ======
+python puzzlesolver.py aggregation.config bfs
+Path in order of when a node is visited:
+N_1
+N_3
+N_2
+Time: 13
+Space: Frontier 6, Visited 7
+Cost: 9
+
+python puzzlesolver.py aggregation.config iddfs
+Path in order of when a node is visited:
+N_1
+N_3
+N_2
+Time: 5
+Space: Frontier 4, Visited 4
+Cost: 9
+
+python puzzlesolver.py aggregation.config unicost
+Path in order of when a node is visited:
+N_1
+N_3
+N_2
+Time: 12
+Space: Frontier 6, Visited 6
+Cost: 9
+
+python puzzlesolver.py aggregation.config greedy
+Path in order of when a node is visited:
+N_1
+N_3
+N_2
+Time: 7
+Space: Frontier 4, Visited 3
+Cost: 9
+
+python puzzlesolver.py aggregation.config astar
+Path in order of when a node is visited:
+N_1
+N_3
+N_2
+Time: 7
+Space: Frontier 4, Visited 3
+Cost: 9
+
+===== monitor.config =====
+python puzzlesolver.py monitor.config bfs
+S_4 monitors T_1
+S_2 monitors T_2
+S_3 monitors T_3
+S_1 monitors T_1
+Time: 229
+Space: Frontier 96, Visited 73
+Cost: 88.0
+
+python puzzlesolver.py monitor.config iddfs
+S_4 monitors T_1
+S_2 monitors T_2
+S_3 monitors T_3
+S_1 monitors T_1
+Time: 50
+Space: Frontier 20, Visited 73
+Cost: 88.0
+
+python puzzlesolver.py monitor.config unicost
+S_2 monitors T_1
+S_3 monitors T_3
+S_4 monitors T_2
+S_1 monitors T_1
+Time: 56
+Space: Frontier 42, Visited 12
+Cost: 100.0
+
+python puzzlesolver.py monitor.config greedy
+S_3 monitors T_2
+S_2 monitors T_1
+S_1 monitors T_3
+S_4 monitors T_1
+Time: 24
+Space: Frontier 20, Visited 4
+Cost: 24.2535625036
+
+python puzzlesolver.py monitor.config astar
+S_2 monitors T_1
+S_3 monitors T_3
+S_4 monitors T_2
+S_1 monitors T_1
+Time: 56
+Space: Frontier 39, Visited 12
+Cost: 100.0
+
+===== test_aggregation1.config =====
+You gave us a bad file and I couldn't tell whether or not you intentionally forgot a ',' on the second line.
+If you did it intentionally, good job.  Every one of my test cases on the original file you gave us is:
+
+python puzzlesolver.py test_aggregation1.config bfs
+There was an error parsing the input!
+
+python puzzlesolver.py test_aggregation1.config iddfs
+There was an error parsing the input!
+
+python puzzlesolver.py test_aggregation1.config unicost
+There was an error parsing the input!
+
+python puzzlesolver.py test_aggregation1.config greedy
+There was an error parsing the input!
+
+python puzzlesolver.py test_aggregation1.config astar
+There was an error parsing the input!
+
+However, if you didn't mean to make that mistake, I went ahead and fixed it.  I just wanted to make sure
+I am giving you all the results and explaining the situation at hand; I don't want to lose points on this
+exhausting project because of a dumb mistake.  So after fixing the mistake in the file, my output for the algorithms are the same as 'aggregation.config' above.
+
+===== test_aggregation2.config ======
+python puzzlesolver.py test_aggregation2.config bfs
+No solution was found!
+
+python puzzlesolver.py test_aggregation2.config iddfs
+No solution was found!
+
+python puzzlesolver.py test_aggregation2.config unicost
+No solution was found!
+
+python puzzlesolver.py test_aggregation2.config greedy
+No solution was found!
+
+python puzzlesolver.py test_aggregation2.config astar
+No solution was found!
+
+===== test_aggregation3.config =====
+python puzzlesolver.py test_aggregation3.config bfs
+Path in order of when a node is visited:
+N_00
+N_05
+N_06
+N_01
+N_02
+N_07
+N_03
+N_04
+Time: 371
+Space: Frontier 98, Visited 298
+Cost: 37
+
+python puzzlesolver.py test_aggregation3.config iddfs
+Path in order of when a node is visited:
+N_00
+N_05
+N_06
+N_01
+N_02
+N_07
+N_03
+N_04
+Time: 249
+Space: Frontier 15, Visited 290
+Cost: 37
+
+python puzzlesolver.py test_aggregation3.config unicost
+Path in order of when a node is visited:
+N_00
+N_01
+N_05
+N_06
+N_02
+N_07
+N_03
+N_04
+Time: 367
+Space: Frontier 87, Visited 266
+Cost: 25
+
+python puzzlesolver.py test_aggregation3.config greedy
+Path in order of when a node is visited:
+N_00
+N_05
+N_06
+N_02
+N_01
+N_07
+N_03
+N_04
+Time: 129
+Space: Frontier 33, Visited 98
+Cost: 28
+
+python puzzlesolver.py test_aggregation3.config astar
+Path in order of when a node is visited:
+N_00
+N_05
+N_01
+N_02
+N_06
+N_07
+N_03
+N_04
+Time: 206
+Space: Frontier 60, Visited 163
+Cost: 25
+
+===== test_monitor1.config =====
+python puzzlesolver.py test_monitor1.config bfs
+S_2 monitors T_2
+S_3 monitors T_3
+S_1 monitors T_1
+Time: 64
+Space: Frontier 36, Visited 28
+Cost: 88.0
+
+python puzzlesolver.py test_monitor1.config iddfs
+S_2 monitors T_2
+S_3 monitors T_3
+S_1 monitors T_1
+Time: 11
+Space: Frontier 12, Visited 28
+Cost: 88.0
+
+python puzzlesolver.py test_monitor1.config unicost
+S_3 monitors T_3
+S_2 monitors T_2
+S_1 monitors T_1
+Time: 25
+Space: Frontier 17, Visited 7
+Cost: 88.0
+
+python puzzlesolver.py test_monitor1.config greedy
+S_3 monitors T_2
+S_2 monitors T_1
+S_1 monitors T_3
+Time: 15
+Space: Frontier 12, Visited 3
+Cost: 24.2535625036
+
+python puzzlesolver.py test_monitor1.config astar
+S_3 monitors T_3
+S_2 monitors T_2
+S_1 monitors T_1
+Time: 25
+Space: Frontier 17, Visited 7
+Cost: 88.0
+
+===== test_monitor2.config =====
+python puzzlesolver.py test_monitor2.config bfs
+S_2 monitors T_2
+S_7 monitors T_1
+S_4 monitors T_4
+S_5 monitors T_5
+S_3 monitors T_3
+S_6 monitors T_6
+S_1 monitors T_1
+Time: 200383
+Space: Frontier 79608, Visited 37633
+Cost: 11.4214382303
+
+python puzzlesolver.py test_monitor2.config iddfs
+S_2 monitors T_2
+S_7 monitors T_1
+S_4 monitors T_4
+S_5 monitors T_5
+S_3 monitors T_3
+S_6 monitors T_6
+S_1 monitors T_1
+Time: 32594
+Space: Frontier 112, Visited 37633
+Cost: 11.4214382303
+
+python puzzlesolver.py test_monitor2.config unicost
+S_4 monitors T_1
+S_7 monitors T_6
+S_1 monitors T_3
+S_5 monitors T_4
+S_3 monitors T_2
+S_6 monitors T_1
+S_2 monitors T_5
+Time: 14615
+Space: Frontier 10284, Visited 1549
+Cost: 13.6548005062
+
+python puzzlesolver.py test_monitor2.config greedy
+S_1 monitors T_4
+S_7 monitors T_2
+S_2 monitors T_1
+S_5 monitors T_5
+S_3 monitors T_3
+S_4 monitors T_6
+S_6 monitors T_1
+Time: 119
+Space: Frontier 112, Visited 7
+Cost: 10.708823422
+
+python puzzlesolver.py test_monitor2.config astar
+No solution was found!
+
+===== test_pancakes1.config =====
+python puzzlesolver.py test_pancakes1.config bfs
+No solution was found!
+
+python puzzlesolver.py test_pancakes1.config iddfs
+No solution was found!
+
+python puzzlesolver.py test_pancakes1.config unicost
+No solution was found!
+
+python puzzlesolver.py test_pancakes1.config greedy
+No solution was found!
+
+python puzzlesolver.py test_pancakes1.config astar
+No solution was found!
+
+===== test_pancakes2.config =====
+python puzzlesolver.py test_pancakes2.config bfs
+No solution was found!
+
+python puzzlesolver.py test_pancakes2.config iddfs
+No solution was found!
+
+python puzzlesolver.py test_pancakes2.config unicost
+No solution was found!
+
+python puzzlesolver.py test_pancakes2.config greedy
+No solution was found!
+
+python puzzlesolver.py test_pancakes2.config astar
+No solution was found!
+
+===== test_pancakes3.config =====
+python puzzlesolver.py test_pancakes3.config bfs
+Time: 254347
+Space: Frontier 94629, Visited 42391
+Cost: 9 flips
+
+python puzzlesolver.py test_pancakes3.config iddfs
+Time: 2491
+Space: Frontier 1, Visited 237
+Cost: 27 flips
+
+python puzzlesolver.py test_pancakes3.config unicost
+Time: 254347
+Space: Frontier 94629, Visited 42391
+Cost: 9 flips
+
+python puzzlesolver.py test_pancakes3.config greedy
+Time: 1033
+Space: Frontier 702, Visited 172
+Cost: 27 flips
+
+python puzzlesolver.py test_pancakes3.config astar
+Time: 14305
+Space: Frontier 10554, Visited 2384
+Cost: 11 flips
