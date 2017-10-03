@@ -88,7 +88,7 @@ def iddfs(init_state, actions, goal_state, transition, unique_value, get_cost, u
         if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
             break
 
-        return_info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 1, 1, unique_value_is_a_set) # initial state,
+        return_info = dfs(init_state, actions, goal_state, set([]), transition, unique_value, 0, i, 1, 1, 1, unique_value_is_a_set, begin_time) # initial state,
         if return_info:
             nodes_created = max(return_info[1], nodes_created)
             max_frontier_size = max(max_frontier_size, return_info[2])
@@ -98,11 +98,15 @@ def iddfs(init_state, actions, goal_state, transition, unique_value, get_cost, u
                 return (return_info[0][0], nodes_created, (max_frontier_size, len(max_explored_size)), cost) # end state, time, (frontier space, explored space), cost
     print("No solution was found!")
 
-def dfs(state, actions, goal_state, explored, transition, unique_value, depth, max_depth, nodes_created, frontier_size, max_frontier_size, unique_value_is_a_set):
+def dfs(state, actions, goal_state, explored, transition, unique_value, depth, max_depth, nodes_created, frontier_size, max_frontier_size, unique_value_is_a_set, begin_time):
     state_unique_identifier = unique_value(state) # Find the unique identifier for this state so we can add it to the explored set
     if unique_value_is_a_set: # Our unique identifier is a list/set and we can't add that directly to explored because explored is a set.
                               # One workout for this is to just convert the list/set to a frozenset.
         state_unique_identifier = frozenset(state_unique_identifier)
+
+    curr_time = ti.time()
+    if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
+        return None
 
     if goal_state(state): # We have reached the goal!
         return ([state], 1, max_frontier_size, explored) # return the goal state, nodes created up to this point, max frontier size up to this point, and the explored states
@@ -114,7 +118,7 @@ def dfs(state, actions, goal_state, explored, transition, unique_value, depth, m
                 new_state = transition(action, state)
                 for state in new_state: # For each new state that is returned, perform DFS
                     frontier_size -= 1 # We have visited a new state, so decrease the frontier size
-                    return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, 0, frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)), unique_value_is_a_set)
+                    return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, 0, frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)), unique_value_is_a_set, begin_time)
                     if not return_value is None: # We have achieved some kind of goal state, so we can work with some new information
                         max_frontier_size = max(max_frontier_size, return_value[2]) # If we increased the frontier size, update it accordingly
                         nodes_created += return_value[1] # Sum up the number of nodes in each sumtree / path we travel
