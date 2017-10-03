@@ -119,6 +119,11 @@ def dfs(state, actions, goal_state, explored, transition, unique_value, depth, m
                 for state in new_state: # For each new state that is returned, perform DFS
                     frontier_size -= 1 # We have visited a new state, so decrease the frontier size
                     return_value = dfs(state, actions, goal_state, explored, transition, unique_value, depth+1, max_depth, 0, frontier_size+len(new_state), max(max_frontier_size, frontier_size+len(new_state)), unique_value_is_a_set, begin_time)
+
+                    curr_time = ti.time()
+                    if curr_time - begin_time >= TEN_MINUTES: # This algorithm is taking way too long on this input
+                        break
+                    
                     if not return_value is None: # We have achieved some kind of goal state, so we can work with some new information
                         max_frontier_size = max(max_frontier_size, return_value[2]) # If we increased the frontier size, update it accordingly
                         nodes_created += return_value[1] # Sum up the number of nodes in each sumtree / path we travel
