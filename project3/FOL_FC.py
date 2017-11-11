@@ -15,7 +15,6 @@ class Clause:
         args = self.fact[left_paren_index+1 : right_paren_index]
         self.variables = args.split(",")
         self.fact = self.fact[0:left_paren_index]
-        #print("vars: " + str(self.variables))
 
     def negated(self):
         return self.negation
@@ -31,19 +30,16 @@ class Clause:
 
 class Predicate:
     def __init__(self, logic):
-        #print(logic)
         self.parse_logic(logic)
 
     def parse_logic(self, logic):
         self.clauses = filter(None, logic.split(" ")) # Filter function removes '' items from list
         if "->" in self.clauses:
-            #print("Rule: ")
             self.clauses = self.convert_rule_to_clauses(self.clauses)
         elif "PROVE" in self.clauses:
-            #print("Assumption: ")
             self.clauses = self.convert_to_assumption(self.clauses)
         else:
-            pass#print("Fact: ")
+            pass
 
         new_clauses = []
         for clause in self.clauses:
@@ -54,7 +50,6 @@ class Predicate:
                 new_clauses.append(clause)
 
         self.clauses_objects = new_clauses
-        #print(self.clauses)
 
     def convert_rule_to_clauses(self, rule):
         index_of_implication = rule.index("->")
@@ -75,71 +70,36 @@ class Predicate:
     def find_negation(self, predicate):
         for clause in self.clauses_objects:
             if not clause in ["^", "v"]:
-                #print("predicate: " + predicate.fact + ", clause: " + clause.fact)
-                #print(str(type(predicate)) + " and " + str(type(clause)))
                 if predicate.negated() and not clause.negated():
-                    #predicate.negate()
                     if predicate.fact == clause.fact:
-                        #print("Found negation a")
-                        #print("predicate args: " + str(predicate.variables))
-                        #print("clause args: " + str(clause.variables))
                         self.unify(self.clauses_objects, clause, predicate)
-                        #print("clause fact: " + clause.fact + ", predicate fact: " + predicate.fact)
                         i = 0
-                        #print("before a: " + self.str())
                         while i < len(self.clauses_objects):
-                            #print("i: " + str(i))
                             if isinstance(self.clauses_objects[i], Clause) and self.clauses_objects[i].fact == predicate.fact:
-                                #print("trying to remove " + self.clauses_objects[i].str())
                                 if i < len(self.clauses_objects)-1:
-                                    #print("removing indices " + str(i) + " and " + str(i+1))
                                     del self.clauses_objects[i+1]
                                     del self.clauses_objects[i]
                                 elif i > 0:
-                                    #print("removing indices " + str(i) + " and " + str(i-1))
                                     del self.clauses_objects[i]
                                     del self.clauses_objects[i-1]
                                 else:
                                     del self.clauses_objects[i]
-                                #if i > 0:
-                                #    self.clauses_objects.remove(self.clauses_objects[i-1])
                             i += 1
-                        #self.clauses_objects = [clause for clause in self.clauses_objects if clause in ["^", "v"] or (isinstance(clause, Clause) and not clause.fact == predicate.fact)]
-                        #print("predicate args: " + str(predicate.variables))
-                        #print("clause args: " + str(clause.variables))
-                        #print(self.str())
                 elif clause.negated() and not predicate.negated():
                     if clause.fact == predicate.fact:
-                        #print("Found negation b")
-                        #print("predicate args: " + str(predicate.variables))
-                        #print("clause args: " + str(clause.variables))
                         self.unify(self.clauses_objects, clause, predicate)
-                        #print("clause fact: " + clause.fact + ", predicate fact: " + predicate.fact)
                         i = 0
-                        #print("\nbefore b (len = " + str(len(self.clauses_objects)) + "): " + self.str())
                         while i < len(self.clauses_objects):
-                            #print("i: " + str(i))
                             if isinstance(self.clauses_objects[i], Clause) and self.clauses_objects[i].fact == predicate.fact:
-                                #print("trying to remove " + self.clauses_objects[i].str())
                                 if i < len(self.clauses_objects)-1:
-                                    #print("removing indices " + str(i) + " and " + str(i+1))
                                     del self.clauses_objects[i+1]
                                     del self.clauses_objects[i]
                                 elif i > 0:
-                                    #print("removing indices " + str(i) + " and " + str(i-1) + " for " + predicate.fact + " in " + self.str())
                                     del self.clauses_objects[i]
                                     del self.clauses_objects[i-1]
                                 else:
-                                    #print("bfore removing 0: " + self.str() + ", len: " + str(len(self.clauses_objects)))
-                                    #print("removing index 0")
                                     del self.clauses_objects[i]
-                                #if i > 0:
-                                #    self.clauses_objects.remove(self.clauses_objects[i-1])
                             i += 1
-                        #self.clauses_objects = [clause for clause in self.clauses_objects if clause in ["^", "v"] or (isinstance(clause, Clause) and not clause.fact == predicate.fact)]
-                        #print("predicate args: " + str(predicate.variables))
-                        #print("clause args: " + str(clause.variables))
-                        #print("result: " + self.str())
 
     def unify(self, clauses, clause, predicate):
         clause_var = clause.variables
@@ -182,35 +142,40 @@ def read_input(test_file):
 
 def create_statements(logic):
     predicates = []
+    line_number = 1
+    prev_begin_line_number = 1
+
     for predicate in logic:
         new_predicate = Predicate(predicate)
         predicates.append(new_predicate)
-        print(new_predicate.str())
+        print(str(line_number) + ". " + new_predicate.str() + " --  Given")
+        line_number += 1
 
     while len(predicates) > 1:
         new_predicates = []
-        print("len: " + str(len(predicates)))
         for i in xrange(0, len(predicates)):
-            print("i BEFORE: " + predicates[i].str())
-            if len(predicates[i].get_predicate()) > 1:
-                for j in xrange(i, len(predicates)):
-                    if not predicates[i] == predicates[j] and len(predicates[j].get_predicate()) == 1:
-                        print("j: " + predicates[j].str())
-                        pred_before = predicates[i].str()
-                        predicates[i].find_negation(predicates[j].get_predicate()[0])
-                        if not pred_before == predicates[i].str():
-                            print("i AFTER: " + predicates[i].str())
-                if len(predicates[i].str()) > 0:
-                    print("pushing " + predicates[i].str())
-                    new_predicates.append(predicates[i])
+            pred_original = predicates[i].str()
+            for j in xrange(i+1, len(predicates)):
+                if not predicates[i] == predicates[j] and len(predicates[j].get_predicate()) == 1:
+                    pred_before = predicates[i].str()
+                    predicates[i].find_negation(predicates[j].get_predicate()[0])
+                    if not pred_before == predicates[i].str():
+                        if len(predicates[i].str()) == 0:
+                            #print(str(line_number) + ". {} --  Resolve from " + str(prev_begin_line_number + i) + " and " + str(prev_begin_line_number + j))
+                            print(str(line_number) + ". {} " + predicates[i].str())
+                        else:
+                            #print(str(line_number) + ". " + predicates[i].str() + " --  Resolve from " + str(prev_begin_line_number + i) + " and " + str(prev_begin_line_number + j))
+                            print(str(line_number) + ". " + predicates[i].str())
+                        line_number += 1
+            if len(predicates[i].str()) > 0 and not pred_original == predicates[i].str():
+                new_predicates.append(predicates[i])
         predicates = new_predicates
-        print()
+        prev_begin_line_number = line_number
 
     if len(predicates) == 0:
-        print("Our initial assumption is false, so our proof is correct!")
+        print("\nDue to our final statement, we have arrived at an empty predicate. \nOur initial assumption is false, so our proof is correct!")
     else:
-        print(predicates[0].str())
-        print("Our initial assumption is true.  Therefore, our proof is incorrect!")
+        print("\nWe have arrived at a non-empty predicate. \nOur initial assumption is true.  Therefore, our proof is incorrect!")
 
     return predicates
 
