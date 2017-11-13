@@ -81,7 +81,7 @@ class Predicate:
                     #print("unifying " + clause.str() + " and " + predicate.str())
                     new_predicate = new_predicate.unify(new_predicate.clauses_objects, clause, predicate)
                     if new_predicate is None:
-                        print("new predicate: None")
+                        #print("new predicate: None")
                         continue
                     #print("new predicate: " + new_predicate.str())
                     if is_satisfied(new_predicate, facts):
@@ -160,7 +160,7 @@ def read_input(test_file):
     return logic
 
 def is_satisfied(predicate, facts):
-    print("checking satisfiable: " + predicate.str())
+    #print("checking satisfiable: " + predicate.str())
     for clause in predicate.LHS_objects:
         if clause not in SYMBOLS:
             #print("clause: " + clause.str())
@@ -171,7 +171,7 @@ def is_satisfied(predicate, facts):
             for fact in facts:
                 #print("comparing " + fact.str() + " to " + clause.str())
                 if fact.str() == clause.str():
-                    print("clause " + clause.str() + " is a fact")
+                    #print("clause " + clause.str() + " is a fact")
                     valid = True
                     break
             if not valid:
@@ -185,7 +185,7 @@ def generate_all_facts_and_rules(rule, all_facts, facts_index, all_existing_fact
     new_predicates = []
     for i in xrange(facts_index, len(all_facts)):
         pred_before = rule.str()
-        print("find match between " + all_facts[i].get_predicates()[0].str() + " and " + pred_before)
+        #print("find match between " + all_facts[i].get_predicates()[0].str() + " and " + pred_before)
         new_rule = rule.find_match(all_facts[i].get_predicates()[0], all_facts + all_existing_facts)
         if not new_rule.str() == pred_before:
             new_predicates.append(new_rule)
@@ -233,11 +233,11 @@ def create_statements(logic):
         i = 0
         #print("# facts: " + str(len(all_facts)) + ", # rules: " + str(len(rules)))
         while i < len(all_rules) and i < 5:
-            print("I = " + str(i) + ", len: " + str(len(all_rules)))
+            #print("I = " + str(i) + ", len: " + str(len(all_rules)))
             pred_original = all_rules[i].str()
             #print("original: " + pred_original)
             new_rule = None
-            print("try to generate new rules and facts from " + all_rules[i].str())
+            #print("try to generate new rules and facts from " + all_rules[i].str())
             new_facts_and_rules = generate_all_facts_and_rules(all_rules[i], facts, 0, all_facts + new_facts)
             for new_info in new_facts_and_rules:
                 if len(new_info.get_predicates()) == 1:
@@ -271,91 +271,17 @@ def create_statements(logic):
                     if not rule_exists and not is_satisfied(new_info, all_facts + new_facts):
                         #all_rules.append(new_info)
                         new_rules.append(new_info)
-                        print("found new rule: " + new_info.str())
+                        #print("found new rule: " + new_info.str())
                         #print(str(line_number) + ". " + new_rule.str())
                         if new_info.str() == goal:
                             found_goal = True
                             break
                         #line_number += 1
                     elif not rule_exists:
-                        print("found fact that was a rule: " + new_info.str())
+                        pass
+                        #print("found fact that was a rule: " + new_info.str())
 
-            j = incremental_facts_index
-            '''while j < len(all_facts):
-                print("\tJ = " + str(j) + ", len: " + str(len(all_facts)) + ", fact: " + all_facts[j].str())
-                if len(all_facts[j].get_predicates()) == 1:
-                    pred_before = all_rules[i].str()
-                    #print("find match between " + facts[j].get_predicates()[0].str() + " and " + rules[i].str())
-                    new_rule = all_rules[i].find_match(all_facts[j].get_predicates()[0], all_facts)
-                    if new_rule is None:
-                        j += 1
-                        continue
-                    #print("new rule: " + new_rule.str())
-                    if not pred_before == new_rule.str():
-                        #print("before: " + pred_before + ", after: pushing " + new_rule.str())
-                        if len(new_rule.str()) > 0:
-                            if len(new_rule.get_predicates()) > 1:
-                                #print("before: " + pred_before + ", after: pushing " + new_rule.str())
-                                #print("keeping " + new_rule.str() + " in rules 3")
-                                rule_exists = False
-                                for rule in all_rules:
-                                    if rule.str() == new_rule.str():
-                                        rule_exists = True
-                                        break
-                                if not rule_exists:
-                                    all_rules.append(new_rule)
-                                    #print(str(line_number) + ". " + new_rule.str())
-                                    if new_rule.str() == goal:
-                                        found_goal = True
-                                        break
-                                    #line_number += 1
-                            else:
-                                #print("moving " + new_rule.str() + " from rules to facts 2")
-                                fact_exists = False
-                                for fact in all_facts:
-                                    if fact.str() == new_rule.str():
-                                        fact_exists = True
-                                        break
-                                if not fact_exists:
-                                    print(str(line_number) + ". " + new_rule.str() + "  --  created from rule " + pred_original + " and fact " + all_facts[j].str())
-                                    line_number += 1
-                                    if new_rule.str() == goal:
-                                        found_goal = True
-                                        break
-                                    new_facts.append(new_rule)
-                                    all_facts.append(new_rule)
-                            #print(str(line_number) + ". " + predicates[i].str() + " --  Resolve from " + str(prev_begin_line_number + i) + " and " + str(prev_begin_line_number + j))
-                j += 1'''
-            #print("new rule: " + new_rule.str())
-            '''if not new_rule is None and len(new_rule.str()) > 0 and not pred_original == new_rule.str():
-                if new_rule.str() == goal:
-                    found_goal = True
-                    #print("pred: " + predicates[i].str() + " and goal: " + goal + " MATCH!")
-                    break
-
-                if len(new_rule.get_predicates()) == 1:
-                    pass
-                    #print("moving " + new_rule.str() + " from rules to facts")
-                    #new_facts.append(new_rule)
-                    #all_facts.append(new_rule)
-                else:
-                    #print("keeping " + new_rule.str() + " in rules 2")
-                    rule_exists = False
-                    for rule in all_rules:
-                        if rule.str() == new_rule.str():
-                            rule_exists = True
-                            break
-                    if not rule_exists:
-                        all_rules.append(new_rule)
-            elif not new_rule is None and len(new_rule.str()) > 0 and pred_original == new_rule.str():
-                #print("keeping " + new_rule.str() + " in rules")
-                rule_exists = False
-                for rule in all_rules:
-                    if rule.str() == new_rule.str():
-                        rule_exists = True
-                        break
-                if not rule_exists:
-                    all_rules.append(new_rule)'''
+            #j = incremental_facts_index
 
             if found_goal:
                 break
@@ -369,7 +295,7 @@ def create_statements(logic):
         #rules = new_rules
         all_rules = all_rules + new_rules
         if len(all_facts) <= old_facts_len and len(all_rules) <= old_rules_len: # We didn't add any new facts
-            print("facts breaking")
+            #print("facts breaking")
             break
         else:
             old_facts_len = len(all_facts)
