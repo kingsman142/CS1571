@@ -216,7 +216,7 @@ def create_statements(logic):
         i = 0
         #print("# facts: " + str(len(all_facts)) + ", # rules: " + str(len(rules)))
         while i < len(all_rules):
-            #print("I = " + str(i) + ", len: " + str(len(all_rules)))
+            print("I = " + str(i) + ", len: " + str(len(all_rules)))
             pred_original = all_rules[i].str()
             #print("original: " + pred_original)
             new_rule = None
