@@ -1,0 +1,56 @@
+1. Parent(x,y) ^ Parent(x,z) ^ Distinct(y,z) -> Sibling(y,z)  --  Given
+2. Parent(x,y) ^ Sibling(x,z) ^ Parent(z,w) -> Cousin(y,w)  --  Given
+3. Distinct(x,y) -> Distinct(y,x)  --  Given
+4. Parent(Lisa,Eric)  --  Given
+5. Parent(Lisa,Rachel)  --  Given
+6. Parent(Speed,Lisa)  --  Given
+7. Parent(Speed,Jay)  --  Given
+8. Parent(Jay,Frances)  --  Given
+9. Distinct(Eric,Rachel)  --  Given
+10. Distinct(Lisa,Jay)  --  Given
+11. Goal: Sibling(Frances,Rachel)
+12. Parent(Lisa,Eric) ^ Parent(Lisa,z) ^ Distinct(Eric,z) -> Sibling(Eric,z)
+13. Sibling(Eric,Rachel)
+14. Parent(Lisa,Rachel) ^ Parent(Lisa,z) ^ Distinct(Rachel,z) -> Sibling(Rachel,z)
+15. Parent(Speed,Lisa) ^ Parent(Speed,z) ^ Distinct(Lisa,z) -> Sibling(Lisa,z)
+16. Sibling(Lisa,Jay)
+17. Parent(Speed,Jay) ^ Parent(Speed,z) ^ Distinct(Jay,z) -> Sibling(Jay,z)
+18. Parent(Jay,Frances) ^ Parent(Jay,z) ^ Distinct(Frances,z) -> Sibling(Frances,z)
+19. Parent(x,Eric) ^ Parent(x,Rachel) ^ Distinct(Eric,Rachel) -> Sibling(Eric,Rachel)
+20. Parent(x,Lisa) ^ Parent(x,Jay) ^ Distinct(Lisa,Jay) -> Sibling(Lisa,Jay)
+21. Parent(Lisa,Eric) ^ Sibling(Lisa,z) ^ Parent(z,w) -> Cousin(Eric,w)
+22. Parent(Lisa,Eric) ^ Sibling(Lisa,z) ^ Parent(z,Rachel) -> Cousin(Eric,Rachel)
+23. Parent(Lisa,Eric) ^ Sibling(Lisa,Speed) ^ Parent(Speed,w) -> Cousin(Eric,w)
+24. Cousin(Eric,Frances)
+25. Parent(Lisa,Rachel) ^ Sibling(Lisa,z) ^ Parent(z,w) -> Cousin(Rachel,w)
+26. Parent(Lisa,Rachel) ^ Sibling(Lisa,Speed) ^ Parent(Speed,w) -> Cousin(Rachel,w)
+27. Cousin(Rachel,Frances)
+28. Parent(Speed,Lisa) ^ Sibling(Speed,z) ^ Parent(z,w) -> Cousin(Lisa,w)
+29. Parent(Speed,Lisa) ^ Sibling(Speed,z) ^ Parent(z,Jay) -> Cousin(Lisa,Jay)
+30. Parent(Speed,Jay) ^ Sibling(Speed,z) ^ Parent(z,w) -> Cousin(Jay,w)
+31. Parent(Speed,Jay) ^ Sibling(Speed,z) ^ Parent(z,Frances) -> Cousin(Jay,Frances)
+32. Parent(Jay,Frances) ^ Sibling(Jay,z) ^ Parent(z,w) -> Cousin(Frances,w)
+33. Distinct(Rachel,Eric)
+34. Distinct(Jay,Lisa)
+35. Parent(x,Rachel) ^ Parent(x,Eric) ^ Distinct(Rachel,Eric) -> Sibling(Rachel,Eric)
+36. Parent(x,Jay) ^ Parent(x,Lisa) ^ Distinct(Jay,Lisa) -> Sibling(Jay,Lisa)
+37. Parent(Eric,y) ^ Sibling(Eric,Rachel) ^ Parent(Rachel,w) -> Cousin(y,w)
+38. Parent(Eric,y) ^ Sibling(Eric,Rachel) ^ Parent(Rachel,Frances) -> Cousin(y,Frances)
+39. Parent(Lisa,y) ^ Sibling(Lisa,Jay) ^ Parent(Jay,w) -> Cousin(y,w)
+40. Parent(x,Eric) ^ Sibling(x,z) ^ Parent(z,Frances) -> Cousin(Eric,Frances)
+41. Parent(x,Rachel) ^ Sibling(x,z) ^ Parent(z,Frances) -> Cousin(Rachel,Frances)
+42. Sibling(Rachel,Eric)
+43. Sibling(Jay,Lisa)
+44. Parent(Lisa,Eric) ^ Sibling(Lisa,Jay) ^ Parent(Jay,w) -> Cousin(Eric,w)
+45. Parent(Lisa,Eric) ^ Sibling(Lisa,z) ^ Parent(z,Frances) -> Cousin(Eric,Frances)
+46. Parent(Lisa,Rachel) ^ Sibling(Lisa,Jay) ^ Parent(Jay,w) -> Cousin(Rachel,w)
+47. Parent(Lisa,Rachel) ^ Sibling(Lisa,z) ^ Parent(z,Frances) -> Cousin(Rachel,Frances)
+48. Parent(Rachel,y) ^ Sibling(Rachel,Eric) ^ Parent(Eric,w) -> Cousin(y,w)
+49. Parent(Jay,y) ^ Sibling(Jay,Lisa) ^ Parent(Lisa,w) -> Cousin(y,w)
+50. Parent(Jay,Frances) ^ Sibling(Jay,Lisa) ^ Parent(Lisa,w) -> Cousin(Frances,w)
+51. Parent(Rachel,Eric) ^ Sibling(Rachel,z) ^ Parent(z,Frances) -> Cousin(Eric,Frances)
+52. Parent(x,Rachel) ^ Sibling(x,Eric) ^ Parent(Eric,Frances) -> Cousin(Rachel,Frances)
+
+Unfortunately, we were not able to prove the goal!
+We exhausted all rules and facts.
+Unification attempts: 272

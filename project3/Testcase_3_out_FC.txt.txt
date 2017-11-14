@@ -1,0 +1,30 @@
+1. Parent(x,y) ^ Parent(x,z) ^ Distinct(y,z) -> Sibling(y,z)  --  Given
+2. Parent(x,y) ^ Sibling(x,z) ^ Parent(z,w) -> Cousin(y,w)  --  Given
+3. Distinct(x,y) -> Distinct(y,x)  --  Given
+4. Parent(Lisa,Eric)  --  Given
+5. Parent(Lisa,Rachel)  --  Given
+6. Parent(Speed,Lisa)  --  Given
+7. Parent(Speed,Jay)  --  Given
+8. Parent(Jay,Frances)  --  Given
+9. Distinct(Eric,Rachel)  --  Given
+10. Distinct(Lisa,Jay)  --  Given
+11. Goal: Cousin(Rachel,Frances)
+12. Parent(Lisa,Eric) ^ Parent(Lisa,z) ^ Distinct(Eric,z) -> Sibling(Eric,z)
+13. Sibling(Eric,Rachel)
+14. Parent(Lisa,Rachel) ^ Parent(Lisa,z) ^ Distinct(Rachel,z) -> Sibling(Rachel,z)
+15. Parent(Speed,Lisa) ^ Parent(Speed,z) ^ Distinct(Lisa,z) -> Sibling(Lisa,z)
+16. Sibling(Lisa,Jay)
+17. Parent(Speed,Jay) ^ Parent(Speed,z) ^ Distinct(Jay,z) -> Sibling(Jay,z)
+18. Parent(Jay,Frances) ^ Parent(Jay,z) ^ Distinct(Frances,z) -> Sibling(Frances,z)
+19. Parent(x,Eric) ^ Parent(x,Rachel) ^ Distinct(Eric,Rachel) -> Sibling(Eric,Rachel)
+20. Parent(x,Lisa) ^ Parent(x,Jay) ^ Distinct(Lisa,Jay) -> Sibling(Lisa,Jay)
+21. Parent(Lisa,Eric) ^ Sibling(Lisa,z) ^ Parent(z,w) -> Cousin(Eric,w)
+22. Parent(Lisa,Eric) ^ Sibling(Lisa,z) ^ Parent(z,Rachel) -> Cousin(Eric,Rachel)
+23. Parent(Lisa,Eric) ^ Sibling(Lisa,Speed) ^ Parent(Speed,w) -> Cousin(Eric,w)
+24. Cousin(Eric,Frances)
+25. Parent(Lisa,Rachel) ^ Sibling(Lisa,z) ^ Parent(z,w) -> Cousin(Rachel,w)
+26. Parent(Lisa,Rachel) ^ Sibling(Lisa,Speed) ^ Parent(Speed,w) -> Cousin(Rachel,w)
+27. Cousin(Rachel,Frances)
+
+Due to our final statement, we have proved the goal correct!
+Unification attempts: 97

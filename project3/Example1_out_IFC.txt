@@ -1,0 +1,23 @@
+1. American(x) ^ Weapon(y) ^ Nation(z) ^ Hostile(z) ^ Sells(x,z,y) -> Criminal(x)  --  Given
+2. Owns(Nono,x) ^ Missile(x) -> Sells(West,Nono,x)  --  Given
+3. Missile(x) -> Weapon(x)  --  Given
+4. Enemy(x,America) -> Hostile(x)  --  Given
+5. American(West)  --  Given
+6. Nation(Nono)  --  Given
+7. Enemy(Nono,America)  --  Given
+8. Owns(Nono,M1)  --  Given
+9. Missile(M1)  --  Given
+10. Nation(America)  --  Given
+11. Goal: Criminal(West)
+12. American(West) ^ Weapon(y) ^ Nation(z) ^ Hostile(z) ^ Sells(West,z,y) -> Criminal(West)
+13. American(West) ^ Weapon(y) ^ Nation(Nono) ^ Hostile(Nono) ^ Sells(West,Nono,y) -> Criminal(West)
+14. American(West) ^ Weapon(y) ^ Nation(America) ^ Hostile(America) ^ Sells(West,America,y) -> Criminal(West)
+15. American(x) ^ Weapon(y) ^ Nation(Nono) ^ Hostile(Nono) ^ Sells(x,Nono,y) -> Criminal(x)
+16. American(x) ^ Weapon(y) ^ Nation(America) ^ Hostile(America) ^ Sells(x,America,y) -> Criminal(x)
+17. Sells(West,Nono,M1)
+18. Weapon(M1)
+19. Hostile(Nono)
+20. Criminal(West)
+
+Due to our final statement, we have proved the goal correct!
+Unification attempts: 15

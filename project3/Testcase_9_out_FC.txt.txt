@@ -1,0 +1,23 @@
+1. Pompeian(x) -> Roman(x)  --  Given
+2. Man(x) -> People(x)  --  Given
+3. People(x) ^ Assassinate(x,y) ^ Ruler(y) -> Traitor(x)  --  Given
+4. Roman(x) ^ Traitor(x) Assassinate(x,y) -> Hate(x,y)  --  Given
+5. Man(Marcus)  --  Given
+6. Pompeian(Marcus)  --  Given
+7. Ruler(Caesar)  --  Given
+8. Man(Caesar)  --  Given
+9. Assassinate(Marcus,Caesar)  --  Given
+10. Goal: Traitor(Caesar)
+11. Roman(Marcus)
+12. People(Marcus)
+13. People(Caesar)
+14. People(x) ^ Assassinate(x,Caesar) ^ Ruler(Caesar) -> Traitor(x)
+15. Traitor(Marcus)
+16. Hate(Marcus,Caesar)
+17. People(Marcus) ^ Assassinate(Marcus,y) ^ Ruler(y) -> Traitor(Marcus)
+18. People(Caesar) ^ Assassinate(Caesar,y) ^ Ruler(y) -> Traitor(Caesar)
+19. Roman(Marcus) ^ Traitor(Marcus) Assassinate(Marcus,y) -> Hate(Marcus,y)
+
+Unfortunately, we were not able to prove the goal!
+We exhausted all rules and facts.
+Unification attempts: 108

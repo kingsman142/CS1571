@@ -1,0 +1,13 @@
+1. Instrument(y) ^ Musician(x) -> Plays(x,y)  --  Given
+2. Instrument(y) ^ Plays(x,y) -> NotToneDeaf(x)  --  Given
+3. Musician(Grace)  --  Given
+4. Instrument(I1)  --  Given
+5. Goal: NotToneDeaf(Grace)
+6. Instrument(y) ^ Musician(Grace) -> Plays(Grace,y)
+7. Plays(Grace,I1)
+8. Instrument(I1) ^ Musician(x) -> Plays(x,I1)
+9. Instrument(I1) ^ Plays(x,I1) -> NotToneDeaf(x)
+10. NotToneDeaf(Grace)
+
+Due to our final statement, we have proved the goal correct!
+Unification attempts: 14

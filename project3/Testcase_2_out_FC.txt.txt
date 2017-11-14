@@ -1,0 +1,18 @@
+1. TooBig(x) ^ GoodSize(y) -> BetterPet(y,x)  --  Given
+2. Giraffe(x) -> TooBig(x)  --  Given
+3. Dog(x) -> GoodSize(x)  --  Given
+4. Barks(x) ^ WagsTail(x) -> Dog(x)  --  Given
+5. Giraffe(Bob)  --  Given
+6. Barks(Sally)  --  Given
+7. WagsTail(Sally)  --  Given
+8. Goal: BetterPet(Bob,Sally)
+9. TooBig(Bob)
+10. Dog(Sally)
+11. TooBig(Bob) ^ GoodSize(y) -> BetterPet(y,Bob)
+12. GoodSize(Sally)
+13. BetterPet(Sally,Bob)
+14. TooBig(x) ^ GoodSize(Sally) -> BetterPet(Sally,x)
+
+Unfortunately, we were not able to prove the goal!
+We exhausted all rules and facts.
+Unification attempts: 55
