@@ -35,7 +35,7 @@ class Predicate:
         self.substitutions = {} # The substituted variables for instances in this particular predicate
 
     def parse_logic(self, logic): # Separate the entire predicate into Clause objects
-        self.clauses = filter(None, logic.split(" ")) # Filter function removes '' items from list
+        self.clauses = logic.split(" ") # Filter function removes '' items from list
         if "->" in self.clauses:
             self.LHS, self.RHS = self.convert_rule_to_clauses(self.clauses) # We need to separate all the clauses on the left of the -> from the clauses on the right
         else: # This predicate is a fact, so there is no RHS; we just want to put all the clauses in the LHS
@@ -94,7 +94,7 @@ class Predicate:
         RHS_objects_copy = []
 
         # Try to find any possible substitions
-        for i in xrange(0, len(clause_var)):
+        for i in range(0, len(clause_var)):
             if not self.is_instance(clause_var[i]): # Current clause arg is a variable, not an instance, so look for a replacement
                 if self.is_instance(predicate_var[i]) and predicate_var[i] not in sub_copy.values(): # The fact's current arg is an instance and the instance hasn't been used in this overarching predicate yet, so it's compatible
                     sub_copy[clause_var[i]] = predicate_var[i]
@@ -106,7 +106,7 @@ class Predicate:
         for curr_clause in clauses:
             if not curr_clause in SYMBOLS:
                 new_clause = curr_clause.copy() # Create a new copy of the clause for the new predicate we're creating since this function is immutable
-                for i in xrange(0, len(new_clause.variables)): # Loop through all the variables in this clause and just try to substitute all of them
+                for i in range(0, len(new_clause.variables)): # Loop through all the variables in this clause and just try to substitute all of them
                     variable = new_clause.variables[i]
                     if variable in sub_copy:
                         new_clause.variables[i] = sub_copy[variable] # Substitute a variable for an instance
@@ -176,7 +176,7 @@ def generate_all_facts_and_rules(rule, all_facts, facts_index, all_existing_fact
         return [rule]
 
     new_predicates = [] # All the new rules and facts that are generated
-    for i in xrange(facts_index, len(all_facts)): # Generic permutation generation loop
+    for i in range(facts_index, len(all_facts)): # Generic permutation generation loop
         pred_before = rule.str()
         new_rule = rule.find_match(all_facts[i].get_predicates()[0], all_facts + all_existing_facts) # See if we can unify this current fact with the predicate
         if not new_rule.str() == pred_before: # There was a successful unification
@@ -209,7 +209,8 @@ def create_statements(logic): # Write out the actual proof to the user
     # Generate all the predicates from the text file logic given to us
     for predicate in logic:
         if "PROVE" in predicate:
-            goal = filter(None, predicate.split(" "))[1]
+            #goal = filter(None, predicate.split(" "))[1]
+            goal = predicate.split(" ")[1]
             print(str(line_number) + ". Goal: " + goal)
         else:
             new_predicate = Predicate(predicate)
