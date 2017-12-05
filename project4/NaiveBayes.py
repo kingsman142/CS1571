@@ -3,7 +3,9 @@ import numpy as np
 import sys
 import os
 
-NUM_FOLDS = 5
+NUM_FOLDS = 5 # Number of folds in our classifier
+
+# Averages for each feature found in the spambase documentation
 FEATURE_MEANS = [.10455, .21301, .28066, .065425, .31222, .095901, .11421, .10529, .090067, .23941,
                  .059824, .5417, .09393, .058626, .049205, .24885, .13259, .18474, 1.6621, .085577,
                  .80976, .1212, .10165, .094269, .5495, .26538, .7673, .12484, .098915, .10285,
@@ -11,6 +13,7 @@ FEATURE_MEANS = [.10455, .21301, .28066, .065425, .31222, .095901, .11421, .1052
                  .043667, .13234, .046099, .079196, .30122, .17982, .0054445, .031869, .038575, .13903,
                  .016976, .26907, .075811, .044238, 5.1915, 52.173, 283.29, .39404]
 
+# Split the dataset into NUM_FOLDS partitions for cross-validation later on
 def generate_folds(dataset):
     if dataset is None:
         return None
@@ -56,17 +59,14 @@ def train(fold_number, dataset, folds):
         if training_set is None and not i == fold_number:
             training_set = folds[i]
         elif not i == fold_number:
-            #print("fold " + str(i) + " size: " + str(len(folds[i])))
             training_set = training_set.append(folds[i])
 
-    #print("test size: " + str(len(testing_set)))
-    #print("train size: " + str(len(training_set)))
-
-    #print("cols: " + str(training_set.columns))
     num_spam = len(training_set.loc[training_set[57] == 1])
     num_non_spam = len(training_set.loc[training_set[57] == 0])
-    #print("spam: " + str(num_spam))
-    #print("non-spam: " + str(num_non_spam))
+    num_spam_dev = len(testing_set.loc[testing_set[57] == 1])
+    num_non_spam_dev = len(testing_set.loc[testing_set[57] == 0])
+
+    pos_neg_train_dev = (num_spam, num_non_spam, num_spam_dev, num_non_spam_dev)
 
     under_spam = []
     over_spam = []
@@ -138,7 +138,7 @@ def train(fold_number, dataset, folds):
     #print("Accuracy: " + str(accuracy))
     #print("False negatives: " + str(false_negatives))
     #print("False positives: " + str(false_positives) + "\n")
-    return (false_negatives, false_positives, accuracy)
+    return (false_negatives, false_positives, accuracy, pos_neg_train_dev, [under_spam, over_spam, under_not_spam, over_not_spam])
 
 data = None
 
@@ -157,14 +157,34 @@ folds = generate_folds(data)
 total_accuracy = 0.0
 total_false_negatives = 0.0
 total_false_positives = 0.0
+print("\n**NOTE** Iteration Fold_1 indicates fold #1 is used for testing and folds #2-5 are used for training.  Same rule follows for future iterations.\n")
+print("Fold | False Positives | False Negatives | Error\n------------------------------------------------")
+pos_neg_train_dev_table = ""
+prob_table_iter_text = ""
 for i in range(0, NUM_FOLDS): # perform cross-validation
-    false_negatives, false_positives, accuracy = train(i, data, folds) # train with training set on fold i, pass in the data and the remaining folds
+    false_negatives, false_positives, accuracy, pos_neg_train_dev, feature_freqs = train(i, data, folds) # train with training set on fold i, pass in the data and the remaining folds
     total_accuracy += accuracy
     total_false_negatives += false_negatives
     total_false_positives += false_positives
-    print("Fold_" + str(5-i) + ", " + str(false_positives) + ", " + str(false_negatives) + ", " + str(1.0 - accuracy))
+    pos_neg_train_dev_table += str(i+1) + " | " + str(pos_neg_train_dev[0]) + " | " + str(pos_neg_train_dev[1]) + " | " + str(pos_neg_train_dev[2]) + " | " + str(pos_neg_train_dev[3]) + "\n"
+    prob_table_iter_text += str(i+1) + " "
+    for j in range(0, 57):
+        prob_table_iter_text += "| " + str(feature_freqs[0][j]) + " | " + str(feature_freqs[1][j]) + " | " + str(feature_freqs[2][j]) + " | " + str(feature_freqs[3][j]) + " "
+    prob_table_iter_text += "\n"
+    print("Fold_" + str(i+1) + ", " + str(false_positives) + ", " + str(false_negatives) + ", " + str(1.0 - accuracy))
 
 average_accuracy = total_accuracy / NUM_FOLDS # Average the accuracy over all the folds
 average_false_negatives = total_false_negatives / NUM_FOLDS
 average_false_positives = total_false_positives / NUM_FOLDS
 print("Avg, " + str(average_false_positives) + ", " + str(average_false_negatives) + ", " + str(1.0 - average_accuracy))
+
+print("\nIteration | pos train samples | neg train samples | pos dev examples | neg dev examples")
+print("---------------------------------------------------------------------------------------")
+print(pos_neg_train_dev_table)
+
+prob_table_text = "Iteration "
+for i in range(0, 57):
+    prob_table_text += "| Pr(F" + str(i+1) + " <= mui | spam)" + "| Pr(" + str(i+1) + " > mui | spam)" + "| Pr(" + str(i+1) + " <= mui | non-spam)" + "| Pr(" + str(i+1) + " > mui | non-spam)"
+print(prob_table_text)
+print("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print(prob_table_iter_text)
