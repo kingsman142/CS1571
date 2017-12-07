@@ -3,7 +3,6 @@ import numpy as np
 import sys
 import os
 
-pandas.set_option('display.precision', 4)
 NUM_FOLDS = 5 # Number of folds in our classifier
 
 # Averages for each feature found in the spambase documentation
@@ -112,9 +111,10 @@ def train(fold_number, dataset, folds):
         elif output_class == 1:
             wrong += 1
             false_positives += 1
+
     accuracy = float(correct) / (correct+wrong)
-    false_negatives_ratio = float(false_negatives) / len(testing_set)
-    false_positives_ratio = float(false_positives) / len(testing_set)
+    false_negatives_ratio = float(false_negatives) / num_spam_dev
+    false_positives_ratio = float(false_positives) / num_non_spam_dev
     return (false_negatives_ratio, false_positives_ratio, accuracy, pos_neg_train_dev, [under_spam, over_spam, under_not_spam, over_not_spam])
 
 data = None
