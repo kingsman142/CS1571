@@ -6,12 +6,7 @@ import os
 NUM_FOLDS = 5 # Number of folds in our classifier
 
 # Averages for each feature found in the spambase documentation
-FEATURE_MEANS = [.10455, .21301, .28066, .065425, .31222, .095901, .11421, .10529, .090067, .23941,
-                 .059824, .5417, .09393, .058626, .049205, .24885, .14259, .18474, 1.6621, .085577,
-                 .80976, .1212, .10165, .094269, .5495, .26538, .7673, .12484, .098915, .10285,
-                 .064753, .047048, .097229, .047835, .10541, .097477, .13695, .013201, .078629, .064834,
-                 .043667, .13234, .046099, .079196, .30122, .17982, .0054445, .031869, .038575, .13903,
-                 .016976, .26907, .075811, .044238, 5.1915, 52.173, 283.29, .39404]
+FEATURE_MEANS = []
 
 # Split the dataset into NUM_FOLDS partitions for cross-validation later on
 def generate_folds(dataset):
@@ -128,6 +123,9 @@ elif not os.path.exists(sys.argv[1]): # Check if the data file even exists
 with open(sys.argv[1]) as spam_data: # Read the data into a DataFrame
     column_names = [i for i in range(0, 58)]
     data = pandas.read_csv(spam_data, names = column_names)
+    for i in range(0, 57): # Automatically calculate the means for each feature to use later on in the conditional probabilities
+        means = np.mean(data[i], axis=0)
+        FEATURE_MEANS.append(means)
 
 folds = generate_folds(data)
 
@@ -144,7 +142,7 @@ for i in range(0, NUM_FOLDS): # perform cross-validation
     total_false_positives += false_positives
 
     # Just a ton of output text processing.  You can ignore a lot of this.
-    pos_neg_train_dev_table += str(i+1) + " | " + str(pos_neg_train_dev[0]) + " | " + str(pos_neg_train_dev[1]) + " | " + str(pos_neg_train_dev[2]) + " | " + str(pos_neg_train_dev[3])
+    pos_neg_train_dev_table += str(i+1) + "         | " + str(pos_neg_train_dev[0]) + "              | " + str(pos_neg_train_dev[1]) + "              | " + str(pos_neg_train_dev[2]) + "             | " + str(pos_neg_train_dev[3])
     if i < NUM_FOLDS-1:
         pos_neg_train_dev_table += "\n"
 
@@ -159,6 +157,6 @@ average_false_negatives = total_false_negatives / NUM_FOLDS
 average_false_positives = total_false_positives / NUM_FOLDS
 print("Avg,    " + str("{:.4f}".format(average_false_positives)) + ", " + str("{:.4f}".format(average_false_negatives)) + ", " + str("{:.4f}".format(1.0 - average_accuracy)))
 
-print("\nIteration | pos train samples | neg train samples | pos dev examples | neg dev examples")
+print("\nIteration | Pos train Samples | Neg train Samples | Pos dev Samples | Neg Dev Samples")
 print("---------------------------------------------------------------------------------------")
 print(pos_neg_train_dev_table)
